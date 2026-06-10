@@ -6,6 +6,25 @@
   padding-bottom: 140rpx;
 }
 
+.viewTag {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(232, 85, 58, 0.08);
+  padding: $spacing-sm $page-padding;
+}
+
+.viewTagText {
+  font-size: $font-size-sm;
+  color: $color-primary;
+  font-weight: $font-weight-medium;
+}
+
+.viewTagClear {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
 .filterBar {
   display: flex;
   align-items: center;

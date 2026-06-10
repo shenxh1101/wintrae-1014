@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import Taro from '@tarojs/taro';
-import { HazardItem, InspectionRoute, EquipmentItem, TrainingItem, MessageItem, TimelineEntry, HazardLevel, HazardType, HazardStatus, UserRole } from '@/types';
+import { HazardItem, InspectionRoute, EquipmentItem, TrainingItem, MessageItem, TimelineEntry, HazardLevel, HazardType, HazardStatus, UserRole, CloseReconciliation } from '@/types';
 import { hazardList } from '@/data/hazard';
 import { inspectionRoutes } from '@/data/inspection';
 import { equipmentList } from '@/data/equipment';
@@ -37,7 +37,7 @@ interface AppState {
 
   addTimelineEntry: (hazardId: string, entry: { action: string; operator: string; remark?: string; imageUrl?: string }) => void;
 
-  closeHazard: (id: string) => void;
+  closeHazard: (id: string, reconciliation?: CloseReconciliation) => void;
 
   getHazardById: (id: string) => HazardItem | undefined;
 
@@ -57,14 +57,14 @@ interface AppState {
   checkOverdue: () => void;
 }
 
-const STORAGE_KEY = 'fire_mgmt_store_v3';
+const STORAGE_KEY = 'fire_mgmt_store_v4';
 
 const nowStr = () => {
   const n = new Date();
   return `${n.getFullYear()}-${String(n.getMonth() + 1).padStart(2, '0')}-${String(n.getDate()).padStart(2, '0')} ${String(n.getHours()).padStart(2, '0')}:${String(n.getMinutes()).padStart(2, '0')}`;
 };
 
-const loadPersisted = () => {
+const loadPersisted = (): Partial<AppState> | null => {
   try {
     const raw = Taro.getStorageSync(STORAGE_KEY);
     if (raw && typeof raw === 'object') {
@@ -78,13 +78,15 @@ const loadPersisted = () => {
 
 const persist = (state: Partial<AppState>) => {
   try {
-    Taro.setStorageSync(STORAGE_KEY, {
-      hazards: state.hazards,
-      inspections: state.inspections,
-      equipments: state.equipments,
-      trainings: state.trainings,
-      messages: state.messages,
-    });
+    const prev = loadPersisted() || {};
+    const merged: Partial<AppState> = {
+      hazards: state.hazards ?? prev.hazards ?? hazardList,
+      inspections: state.inspections ?? prev.inspections ?? inspectionRoutes,
+      equipments: state.equipments ?? prev.equipments ?? equipmentList,
+      trainings: state.trainings ?? prev.trainings ?? trainingList,
+      messages: state.messages ?? prev.messages ?? defaultMessageList,
+    };
+    Taro.setStorageSync(STORAGE_KEY, merged);
   } catch (e) {
     console.error('[Store] persist failed:', e);
   }
@@ -139,6 +141,15 @@ const ensureTimeline = (h: HazardItem): HazardItem => {
     entries.push(makeTimelineEntry('复查验收', '复查人员', h.rectifyResult));
   }
   return { ...h, timeline: entries };
+};
+
+const markHazardRelatedMessagesRead = (msgs: MessageItem[], hazardId: string): MessageItem[] => {
+  return msgs.map(m => {
+    if (m.relatedId === hazardId && m.relatedType === 'hazard' && !m.read) {
+      return { ...m, read: true };
+    }
+    return m;
+  });
 };
 
 export const useAppStore = create<AppState>((set, get) => ({
@@ -283,12 +294,20 @@ export const useAppStore = create<AppState>((set, get) => ({
     });
   },
 
-  closeHazard: (id) => {
+  closeHazard: (id, reconciliation) => {
     set(s => {
       let newInspections = s.inspections;
       const hazards = s.hazards.map(h => {
         if (h.id !== id) return h;
-        const newTimeline = [...h.timeline, makeTimelineEntry('关闭隐患', '当前用户', '隐患已关闭')];
+        const closeRemark = reconciliation
+          ? `最终原因：${reconciliation.finalCause}；复查人：${reconciliation.reviewer}；关闭说明：${reconciliation.closeNote}`
+          : '隐患已关闭';
+        const newTimeline = [...h.timeline, makeTimelineEntry(
+          '关闭隐患',
+          '当前用户',
+          closeRemark,
+          reconciliation?.rectifyImageUrl || undefined
+        )];
 
         if (h.sourceRouteId && h.sourcePointId) {
           newInspections = newInspections.map(r => {
@@ -304,10 +323,16 @@ export const useAppStore = create<AppState>((set, get) => ({
           });
         }
 
-        return { ...h, status: 'closed' as HazardStatus, timeline: newTimeline };
+        return {
+          ...h,
+          status: 'closed' as HazardStatus,
+          timeline: newTimeline,
+          closeReconciliation: reconciliation,
+        };
       });
 
-      const nextState = { hazards, inspections: newInspections };
+      const messages = markHazardRelatedMessagesRead(s.messages, id);
+      const nextState = { hazards, inspections: newInspections, messages };
       persist(nextState);
       return nextState;
     });

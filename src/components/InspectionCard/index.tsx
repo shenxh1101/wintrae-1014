@@ -17,7 +17,6 @@ const statusMap: Record<string, string> = {
 
 const InspectionCard: React.FC<InspectionCardProps> = ({ data }) => {
   const handleClick = () => {
-    if (data.status === 'completed') return;
     Taro.navigateTo({ url: `/pages/inspect/check/index?id=${data.id}` });
   };
 

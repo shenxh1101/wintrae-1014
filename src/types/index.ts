@@ -13,6 +13,13 @@ export interface TimelineEntry {
   imageUrl?: string;
 }
 
+export interface CloseReconciliation {
+  finalCause: string;
+  rectifyImageUrl?: string;
+  reviewer: string;
+  closeNote: string;
+}
+
 export interface HazardItem {
   id: string;
   title: string;
@@ -36,6 +43,7 @@ export interface HazardItem {
   sourcePointName?: string;
   sourceRouteName?: string;
   timeline: TimelineEntry[];
+  closeReconciliation?: CloseReconciliation;
 }
 
 export interface InspectionPoint {

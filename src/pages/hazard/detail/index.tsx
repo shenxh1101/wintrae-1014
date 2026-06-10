@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, Image, Textarea } from '@tarojs/components';
+import { View, Text, Image, Textarea, Input } from '@tarojs/components';
 import Taro, { useRouter, useDidShow } from '@tarojs/taro';
 import { hazardTypeMap, hazardLevelMap, hazardStatusMap } from '@/data/hazard';
 import { useAppStore } from '@/store';
@@ -17,6 +17,11 @@ const HazardDetailPage: React.FC = () => {
   const [showAddNote, setShowAddNote] = useState(false);
   const [noteText, setNoteText] = useState('');
   const [noteImage, setNoteImage] = useState('');
+  const [showCloseModal, setShowCloseModal] = useState(false);
+  const [reconCause, setReconCause] = useState('');
+  const [reconImage, setReconImage] = useState('');
+  const [reconReviewer, setReconReviewer] = useState('');
+  const [reconNote, setReconNote] = useState('');
 
   useDidShow(() => {
     setHazard(getHazardById(id));
@@ -50,7 +55,7 @@ const HazardDetailPage: React.FC = () => {
     Taro.showToast({ title: '备注已添加', icon: 'success' });
   };
 
-  const handleChooseImage = () => {
+  const handleChooseNoteImage = () => {
     Taro.chooseImage({
       count: 1,
       sizeType: ['compressed'],
@@ -61,18 +66,69 @@ const HazardDetailPage: React.FC = () => {
     });
   };
 
-  const handleClose = () => {
+  const handleChooseReconImage = () => {
+    Taro.chooseImage({
+      count: 1,
+      sizeType: ['compressed'],
+      sourceType: ['album', 'camera'],
+      success: (res) => {
+        setReconImage(res.tempFilePaths[0]);
+      }
+    });
+  };
+
+  const handleCloseClick = () => {
+    if (hazard.status === 'rectified' || hazard.status === 'closed') {
+      setReconReviewer(hazard.inspector || '当前巡检员');
+      setShowCloseModal(true);
+      return;
+    }
     Taro.showModal({
       title: '确认关闭',
-      content: '关闭后该隐患将标记为已关闭，确认？',
+      content: '建议先完成整改和复查再关闭。确认直接关闭？',
       success: (res) => {
         if (res.confirm) {
-          closeHazard(id);
-          setHazard(getHazardById(id));
-          Taro.showToast({ title: '已关闭', icon: 'success' });
+          setReconReviewer(hazard.inspector || '当前巡检员');
+          setShowCloseModal(true);
         }
       }
     });
+  };
+
+  const handleSubmitClose = () => {
+    if (!reconCause.trim()) {
+      Taro.showToast({ title: '请填写最终原因', icon: 'none' });
+      return;
+    }
+    if (!reconReviewer.trim()) {
+      Taro.showToast({ title: '请填写复查人', icon: 'none' });
+      return;
+    }
+    if (!reconNote.trim()) {
+      Taro.showToast({ title: '请填写关闭说明', icon: 'none' });
+      return;
+    }
+    closeHazard(id, {
+      finalCause: reconCause,
+      rectifyImageUrl: reconImage || undefined,
+      reviewer: reconReviewer,
+      closeNote: reconNote,
+    });
+    setHazard(getHazardById(id));
+    setShowCloseModal(false);
+    setReconCause('');
+    setReconImage('');
+    setReconReviewer('');
+    setReconNote('');
+    Taro.showToast({ title: '已关闭，待办已同步', icon: 'success' });
+  };
+
+  const handleCancelClose = () => {
+    setShowCloseModal(false);
+    setReconCause('');
+    setReconImage('');
+    setReconReviewer('');
+    setReconNote('');
   };
 
   return (
@@ -116,8 +172,12 @@ const HazardDetailPage: React.FC = () => {
             </View>
           </View>
           {hazard.sourcePointName && (
-            <View className={styles.sourceInfo}>
-              <Text className={styles.sourceLabel}>巡检来源</Text>
+            <View className={styles.sourceInfo} onClick={() => {
+              if (hazard.sourceRouteId) {
+                Taro.navigateTo({ url: `/pages/inspect/check/index?id=${hazard.sourceRouteId}` });
+              }
+            }}>
+              <Text className={styles.sourceLabel}>巡检来源（点击查看）</Text>
               <Text className={styles.sourceValue}>
                 路线「{hazard.sourceRouteName || hazard.sourceRouteId}」· 点位「{hazard.sourcePointName}」
               </Text>
@@ -126,6 +186,34 @@ const HazardDetailPage: React.FC = () => {
           <Text className={styles.descTitle}>隐患描述</Text>
           <Text className={styles.descText}>{hazard.description}</Text>
         </View>
+
+        {hazard.closeReconciliation && (
+          <View className={styles.reconCard}>
+            <Text className={styles.reconTitle}>闭环复盘信息</Text>
+            <View className={styles.reconItem}>
+              <Text className={styles.reconLabel}>最终原因</Text>
+              <Text className={styles.reconValue}>{hazard.closeReconciliation.finalCause}</Text>
+            </View>
+            {hazard.closeReconciliation.rectifyImageUrl && (
+              <View className={styles.reconItem}>
+                <Text className={styles.reconLabel}>整改照片</Text>
+                <Image
+                  className={styles.reconImage}
+                  src={hazard.closeReconciliation.rectifyImageUrl}
+                  mode="aspectFill"
+                />
+              </View>
+            )}
+            <View className={styles.reconItem}>
+              <Text className={styles.reconLabel}>复查人</Text>
+              <Text className={styles.reconValue}>{hazard.closeReconciliation.reviewer}</Text>
+            </View>
+            <View className={styles.reconItem}>
+              <Text className={styles.reconLabel}>关闭说明</Text>
+              <Text className={styles.reconValue}>{hazard.closeReconciliation.closeNote}</Text>
+            </View>
+          </View>
+        )}
 
         <View className={styles.timelineCard}>
           <View className={styles.timelineHeader}>
@@ -185,7 +273,7 @@ const HazardDetailPage: React.FC = () => {
         <View className={styles.noteModal}>
           <View className={styles.noteContent}>
             <Text className={styles.noteTitle}>补充备注</Text>
-            <View className={styles.noteImageRow} onClick={handleChooseImage}>
+            <View className={styles.noteImageRow} onClick={handleChooseNoteImage}>
               {noteImage ? (
                 <Image className={styles.notePreview} src={noteImage} mode="aspectFill" />
               ) : (
@@ -213,11 +301,75 @@ const HazardDetailPage: React.FC = () => {
         </View>
       )}
 
-      {hazard.status !== 'closed' && !showAddNote && (
+      {showCloseModal && (
+        <View className={styles.closeModal}>
+          <View className={styles.closeContent}>
+            <Text className={styles.closeTitle}>关闭隐患复盘</Text>
+            <Text className={styles.closeSubtitle}>请填写以下复盘信息，关闭后相关待办消息会自动消除</Text>
+
+            <View className={styles.fieldRow}>
+              <Text className={styles.fieldLabel}>最终原因 <Text className={styles.required}>*</Text></Text>
+              <Textarea
+                className={styles.fieldTextarea}
+                placeholder="请描述隐患产生的根本原因"
+                value={reconCause}
+                onInput={e => setReconCause(e.detail.value)}
+                maxlength={200}
+              />
+            </View>
+
+            <View className={styles.fieldRow}>
+              <Text className={styles.fieldLabel}>整改照片（可选）</Text>
+              <View className={styles.imageRow} onClick={handleChooseReconImage}>
+                {reconImage ? (
+                  <Image className={styles.reconImagePreview} src={reconImage} mode="aspectFill" />
+                ) : (
+                  <View className={styles.addImageBtn}>
+                    <Text className={styles.addImageText}>+ 拍照/选图</Text>
+                  </View>
+                )}
+              </View>
+            </View>
+
+            <View className={styles.fieldRow}>
+              <Text className={styles.fieldLabel}>复查人 <Text className={styles.required}>*</Text></Text>
+              <Input
+                className={styles.fieldInput}
+                placeholder="请输入复查人姓名"
+                value={reconReviewer}
+                onInput={e => setReconReviewer(e.detail.value)}
+                maxlength={20}
+              />
+            </View>
+
+            <View className={styles.fieldRow}>
+              <Text className={styles.fieldLabel}>关闭说明 <Text className={styles.required}>*</Text></Text>
+              <Textarea
+                className={styles.fieldTextarea}
+                placeholder="请填写关闭说明和后续措施"
+                value={reconNote}
+                onInput={e => setReconNote(e.detail.value)}
+                maxlength={200}
+              />
+            </View>
+
+            <View className={styles.closeBtns}>
+              <View className={styles.closeCancelBtn} onClick={handleCancelClose}>
+                <Text className={styles.closeCancelText}>取消</Text>
+              </View>
+              <View className={styles.closeSubmitBtn} onClick={handleSubmitClose}>
+                <Text className={styles.closeSubmitText}>确认关闭</Text>
+              </View>
+            </View>
+          </View>
+        </View>
+      )}
+
+      {hazard.status !== 'closed' && !showAddNote && !showCloseModal && (
         <View className={styles.bottomBar}>
           <View
             className={classnames(styles.actionBtn, styles.actionBtnSecondary)}
-            onClick={handleClose}
+            onClick={handleCloseClick}
           >
             <Text className={classnames(styles.actionBtnText, styles.actionBtnTextSecondary)}>关闭隐患</Text>
           </View>

@@ -1,9 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { View, Text, Textarea, Image } from '@tarojs/components';
 import Taro, { useRouter, useDidShow } from '@tarojs/taro';
 import { useAppStore } from '@/store';
+import { hazardStatusMap } from '@/data/hazard';
 import classnames from 'classnames';
 import styles from './index.module.scss';
+
+const statusColorMap: Record<string, string> = {
+  pending: '#FF7D00',
+  processing: '#2B5FD9',
+  rectified: '#00B42A',
+  closed: '#86909C',
+};
 
 const InspectCheckPage: React.FC = () => {
   const router = useRouter();
@@ -12,6 +20,8 @@ const InspectCheckPage: React.FC = () => {
   const checkPoint = useAppStore(s => s.checkPoint);
   const completeRoute = useAppStore(s => s.completeRoute);
   const addHazard = useAppStore(s => s.addHazard);
+  const getHazardById = useAppStore(s => s.getHazardById);
+  const hazards = useAppStore(s => s.hazards);
 
   const [route, setRoute] = useState(() => getRouteById(routeId));
   const [reportingPointId, setReportingPointId] = useState<string | null>(null);
@@ -33,13 +43,29 @@ const InspectCheckPage: React.FC = () => {
     );
   }
 
+  const isCompleted = route.status === 'completed';
   const checkedCount = route.points.filter(p => p.checked).length;
   const totalCount = route.points.length;
   const progress = totalCount > 0 ? Math.round((checkedCount / totalCount) * 100) : 0;
 
+  const hazardStatusForPoint = useMemo(() => {
+    const map: Record<string, { status?: string; closed?: boolean; title?: string }> = {};
+    route.points.forEach(p => {
+      if (p.anomalyHazardId) {
+        const h = hazards.find(hz => hz.id === p.anomalyHazardId);
+        map[p.id] = {
+          status: h?.status,
+          closed: p.anomalyClosed,
+          title: h?.title,
+        };
+      }
+    });
+    return map;
+  }, [route.points, hazards]);
+
   const handleCheck = (pointId: string) => {
     const point = route.points.find(p => p.id === pointId);
-    if (point?.checked) return;
+    if (point?.checked || isCompleted) return;
     checkPoint(routeId, pointId);
     const r = getRouteById(routeId);
     if (r) setRoute(r);
@@ -48,7 +74,7 @@ const InspectCheckPage: React.FC = () => {
 
   const handleReportAnomaly = (pointId: string) => {
     const point = route.points.find(p => p.id === pointId);
-    if (!point) return;
+    if (!point || isCompleted) return;
     setReportingPointId(pointId);
     setReportRemark('');
     setReportImageUrl('');
@@ -120,16 +146,39 @@ const InspectCheckPage: React.FC = () => {
     setTimeout(() => Taro.navigateBack(), 1500);
   };
 
+  const handleBack = () => {
+    Taro.navigateBack();
+  };
+
   return (
     <View className={styles.container}>
       <View className={styles.header}>
-        <Text className={styles.routeName}>{route.name}</Text>
+        <View className={styles.headerTop}>
+          <View className={styles.backBtn} onClick={handleBack}>
+            <Text className={styles.backIcon}>←</Text>
+          </View>
+          <Text className={styles.routeName}>{route.name}</Text>
+          <View className={classnames(styles.routeStatusTag, isCompleted && styles.routeStatusTagDone)}>
+            <Text className={styles.routeStatusText}>
+              {isCompleted ? '已完成' : route.status === 'pending' ? '待开始' : '进行中'}
+            </Text>
+          </View>
+        </View>
         <View className={styles.progressRow}>
           <View className={styles.progressBg}>
-            <View className={styles.progressFill} style={{ width: `${progress}%` }} />
+            <View
+              className={classnames(styles.progressFill, isCompleted && styles.progressFillDone)}
+              style={{ width: `${progress}%` }}
+            />
           </View>
           <Text className={styles.progressText}>{checkedCount}/{totalCount}</Text>
         </View>
+        {route.startTime && (
+          <View className={styles.timeInfo}>
+            <Text className={styles.timeInfoText}>开始：{route.startTime}</Text>
+            {route.endTime && <Text className={styles.timeInfoText}>结束：{route.endTime}</Text>}
+          </View>
+        )}
       </View>
 
       <View className={styles.pointList}>
@@ -137,17 +186,40 @@ const InspectCheckPage: React.FC = () => {
           const isChecked = point.checked;
           const hasAnomaly = !!point.anomalyHazardId;
           const anomalyClosed = !!point.anomalyClosed;
+          const hazardInfo = hazardStatusForPoint[point.id];
           return (
-            <View key={point.id} className={styles.pointCard}>
+            <View
+              key={point.id}
+              className={classnames(styles.pointCard, hasAnomaly && styles.pointCardAnomaly)}
+            >
               <View className={styles.pointHeader}>
-                <Text className={styles.pointName}>{point.name}</Text>
+                <View className={styles.pointNameRow}>
+                  <Text className={styles.pointName}>{point.name}</Text>
+                  {isChecked && <View className={styles.checkIcon}><Text>✓</Text></View>}
+                </View>
                 <View className={styles.pointActions}>
-                  {!hasAnomaly && (
+                  {!hasAnomaly && !isCompleted && (
                     <View
                       className={classnames(styles.reportBtn)}
                       onClick={() => handleReportAnomaly(point.id)}
                     >
                       <Text className={styles.reportBtnText}>异常上报</Text>
+                    </View>
+                  )}
+                  {hasAnomaly && hazardInfo?.status && (
+                    <View
+                      className={styles.hazardStatusTag}
+                      style={{ background: `${statusColorMap[hazardInfo.status]}15` }}
+                      onClick={() => {
+                        if (point.anomalyHazardId) {
+                          Taro.navigateTo({ url: `/pages/hazard/detail/index?id=${point.anomalyHazardId}` });
+                        }
+                      }}
+                    >
+                      <View className={styles.hazardDot} style={{ background: statusColorMap[hazardInfo.status] }} />
+                      <Text className={styles.hazardStatusText} style={{ color: statusColorMap[hazardInfo.status] }}>
+                        {hazardStatusMap[hazardInfo.status]?.label || hazardInfo.status}
+                      </Text>
                     </View>
                   )}
                   {hasAnomaly && (
@@ -164,21 +236,38 @@ const InspectCheckPage: React.FC = () => {
                       </Text>
                     </View>
                   )}
-                  <View
-                    className={classnames(styles.checkBtn, isChecked ? styles.checkBtnDone : styles.checkBtnPending)}
-                    onClick={() => handleCheck(point.id)}
-                  >
-                    <Text className={classnames(styles.checkBtnText, isChecked ? styles.checkBtnTextDone : styles.checkBtnTextPending)}>
-                      {isChecked ? '已打卡' : '打卡'}
-                    </Text>
-                  </View>
+                  {!isCompleted && (
+                    <View
+                      className={classnames(styles.checkBtn, isChecked ? styles.checkBtnDone : styles.checkBtnPending)}
+                      onClick={() => handleCheck(point.id)}
+                    >
+                      <Text className={classnames(styles.checkBtnText, isChecked ? styles.checkBtnTextDone : styles.checkBtnTextPending)}>
+                        {isChecked ? '已打卡' : '打卡'}
+                      </Text>
+                    </View>
+                  )}
+                  {isCompleted && isChecked && (
+                    <View className={classnames(styles.checkBtn, styles.checkBtnDone)}>
+                      <Text className={classnames(styles.checkBtnText, styles.checkBtnTextDone)}>已完成</Text>
+                    </View>
+                  )}
                 </View>
               </View>
               <View className={styles.pointInfo}>
                 <Text className={styles.pointLocation}>{point.floor} · {point.location}</Text>
                 {point.checkTime && <Text className={styles.pointTime}>{point.checkTime}</Text>}
               </View>
-              {point.remark && <Text className={styles.pointRemark}>{point.remark}</Text>}
+              {hasAnomaly && hazardInfo?.title && (
+                <View className={styles.pointAnomalyInfo} onClick={() => {
+                  if (point.anomalyHazardId) {
+                    Taro.navigateTo({ url: `/pages/hazard/detail/index?id=${point.anomalyHazardId}` });
+                  }
+                }}>
+                  <Text className={styles.pointAnomalyLabel}>关联隐患：</Text>
+                  <Text className={styles.pointAnomalyValue}>{hazardInfo.title}</Text>
+                </View>
+              )}
+              {point.remark && <Text className={styles.pointRemark}>巡检备注：{point.remark}</Text>}
             </View>
           );
         })}
@@ -228,6 +317,14 @@ const InspectCheckPage: React.FC = () => {
             <Text className={styles.finishText}>
               {checkedCount === totalCount ? '完成巡检' : '结束巡检'}
             </Text>
+          </View>
+        </View>
+      )}
+
+      {isCompleted && !reportingPointId && (
+        <View className={styles.bottomBar}>
+          <View className={styles.backToListBtn} onClick={handleBack}>
+            <Text className={styles.backToListText}>返回巡检列表</Text>
           </View>
         </View>
       )}

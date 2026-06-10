@@ -12,17 +12,64 @@
   border-radius: 0 0 $radius-xl $radius-xl;
 }
 
+.headerTop {
+  display: flex;
+  align-items: center;
+  margin-bottom: $spacing-sm;
+}
+
+.backBtn {
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: $radius-round;
+  background: rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: $spacing-sm;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.9;
+  }
+}
+
+.backIcon {
+  font-size: $font-size-lg;
+  color: $color-text-white;
+  font-weight: $font-weight-bold;
+}
+
 .routeName {
+  flex: 1;
   font-size: $font-size-xl;
   font-weight: $font-weight-bold;
   color: $color-text-white;
-  margin-bottom: $spacing-sm;
+}
+
+.routeStatusTag {
+  padding: 6rpx 20rpx;
+  border-radius: $radius-round;
+  background: rgba(255, 255, 255, 0.2);
+  transition: all $transition-base;
+}
+
+.routeStatusTagDone {
+  background: $color-success;
+}
+
+.routeStatusText {
+  font-size: $font-size-xs;
+  color: $color-text-white;
+  font-weight: $font-weight-medium;
+  white-space: nowrap;
 }
 
 .progressRow {
   display: flex;
   align-items: center;
   gap: $spacing-sm;
+  margin-bottom: $spacing-sm;
 }
 
 .progressBg {
@@ -38,6 +85,21 @@
   background: $color-text-white;
   border-radius: 8rpx;
   transition: width $transition-base;
+}
+
+.progressFillDone {
+  background: $color-success;
+}
+
+.timeInfo {
+  display: flex;
+  gap: $spacing-md;
+}
+
+.timeInfoText {
+  font-size: $font-size-xs;
+  color: rgba(255, 255, 255, 0.8);
+  white-space: nowrap;
 }
 
 .progressText {
@@ -56,26 +118,56 @@
   padding: $spacing-lg;
   box-shadow: $shadow-card;
   margin-bottom: $spacing-md;
+  transition: all $transition-base;
+}
+
+.pointCardAnomaly {
+  border-left: 6rpx solid $color-risk-high;
 }
 
 .pointHeader {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   margin-bottom: $spacing-sm;
+  gap: $spacing-sm;
+}
+
+.pointNameRow {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+  flex: 1;
 }
 
 .pointName {
   font-size: $font-size-lg;
   font-weight: $font-weight-medium;
   color: $color-text-primary;
-  flex: 1;
+}
+
+.checkIcon {
+  width: 36rpx;
+  height: 36rpx;
+  border-radius: $radius-round;
+  background: $color-success;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  view {
+    font-size: 20rpx;
+    color: $color-text-white;
+    font-weight: $font-weight-bold;
+  }
 }
 
 .pointActions {
   display: flex;
   align-items: center;
   gap: $spacing-sm;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 .reportBtn {
@@ -122,6 +214,55 @@
 
 .anomalyTagClosed .anomalyTagText {
   color: $color-success;
+}
+
+.hazardStatusTag {
+  display: inline-flex;
+  align-items: center;
+  padding: 6rpx 14rpx 6rpx 10rpx;
+  border-radius: $radius-round;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.9;
+  }
+}
+
+.hazardDot {
+  width: 12rpx;
+  height: 12rpx;
+  border-radius: $radius-round;
+  margin-right: 6rpx;
+  flex-shrink: 0;
+}
+
+.hazardStatusText {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  white-space: nowrap;
+}
+
+.pointAnomalyInfo {
+  margin-top: $spacing-xs;
+  padding: $spacing-sm;
+  background: $color-bg-page;
+  border-radius: $radius-sm;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.9;
+  }
+}
+
+.pointAnomalyLabel {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.pointAnomalyValue {
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+  font-weight: $font-weight-medium;
 }
 
 .reportRoute {
@@ -217,6 +358,28 @@
   font-size: $font-size-lg;
   font-weight: $font-weight-medium;
   color: $color-text-white;
+}
+
+.backToListBtn {
+  width: 100%;
+  height: $button-height-lg;
+  background: $color-bg-page;
+  border: 1rpx solid $color-border;
+  border-radius: $radius-button;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.9;
+  }
+}
+
+.backToListText {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-medium;
+  color: $color-text-secondary;
 }
 
 .reportModal {

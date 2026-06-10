@@ -1,6 +1,6 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { View, Text, ScrollView } from '@tarojs/components';
-import Taro, { useDidShow } from '@tarojs/taro';
+import Taro, { useRouter, useDidShow } from '@tarojs/taro';
 import { HazardStatus, HazardLevel } from '@/types';
 import { useAppStore } from '@/store';
 import HazardCard from '@/components/HazardCard';
@@ -24,15 +24,20 @@ const levelFilters: { key: HazardLevel | 'all'; label: string }[] = [
 
 const floorOptions = ['全部', '1F', '2F', '3F', '4F', '5F', 'B1'];
 
+type DashboardView = 'new' | 'pending_rectify' | 'review_fail' | 'closed' | 'overdue' | null;
+
 let preservedStatus: HazardStatus | 'all' = 'all';
 let preservedLevel: HazardLevel | 'all' = 'all';
 let preservedFloor = '全部';
 
 const HazardPage: React.FC = () => {
+  const router = useRouter();
+  const initialView = (router.params.view as DashboardView) || null;
   const [activeStatus, setActiveStatus] = useState<HazardStatus | 'all'>(preservedStatus);
   const [activeLevel, setActiveLevel] = useState<HazardLevel | 'all'>(preservedLevel);
   const [activeFloor, setActiveFloor] = useState(preservedFloor);
   const [showFilter, setShowFilter] = useState(false);
+  const [dashboardView, setDashboardView] = useState<DashboardView>(initialView);
   const hazards = useAppStore(s => s.hazards);
   const checkOverdue = useAppStore(s => s.checkOverdue);
 
@@ -41,9 +46,41 @@ const HazardPage: React.FC = () => {
     checkOverdue();
   });
 
+  useEffect(() => {
+    if (!dashboardView) return;
+    switch (dashboardView) {
+      case 'new':
+        setActiveStatus('all');
+        setActiveLevel('all');
+        setActiveFloor('全部');
+        break;
+      case 'pending_rectify':
+        setActiveStatus('pending');
+        setActiveLevel('all');
+        setActiveFloor('全部');
+        break;
+      case 'review_fail':
+        setActiveStatus('processing');
+        setActiveLevel('all');
+        setActiveFloor('全部');
+        break;
+      case 'closed':
+        setActiveStatus('closed');
+        setActiveLevel('all');
+        setActiveFloor('全部');
+        break;
+      case 'overdue':
+        setActiveStatus('processing');
+        setActiveLevel('all');
+        setActiveFloor('全部');
+        break;
+    }
+  }, [dashboardView]);
+
   const handleStatusChange = useCallback((key: HazardStatus | 'all') => {
     setActiveStatus(key);
     preservedStatus = key;
+    setDashboardView(null);
   }, []);
 
   const handleLevelChange = useCallback((key: HazardLevel | 'all') => {
@@ -56,35 +93,81 @@ const HazardPage: React.FC = () => {
     preservedFloor = floor;
   }, []);
 
+  const todayDate = new Date().toISOString().slice(0, 10);
+  const isToday = (timeStr?: string) => timeStr && timeStr.slice(0, 10) === todayDate;
+  const isOverdue = (h: typeof hazards[number]) =>
+    h.status === 'processing' && !!h.deadline && new Date(h.deadline) < new Date();
+  const isReviewFail = (h: typeof hazards[number]) =>
+    h.status === 'processing' && h.rectifyResult && h.rectifyResult.indexOf('不合格') > -1;
+
   const filteredList = useMemo(() => {
-    return hazards.filter(h => {
+    let list = hazards.filter(h => {
       if (activeStatus !== 'all' && h.status !== activeStatus) return false;
       if (activeLevel !== 'all' && h.level !== activeLevel) return false;
       if (activeFloor !== '全部' && h.floor !== activeFloor) return false;
       return true;
     });
-  }, [activeStatus, activeLevel, activeFloor, hazards]);
 
-  const hasActiveFilter = activeStatus !== 'all' || activeLevel !== 'all' || activeFloor !== '全部';
+    switch (dashboardView) {
+      case 'new':
+        list = list.filter(h => isToday(h.reportTime));
+        break;
+      case 'pending_rectify':
+        list = list.filter(h => h.status === 'pending');
+        break;
+      case 'review_fail':
+        list = list.filter(isReviewFail);
+        break;
+      case 'closed':
+        list = list.filter(h => h.status === 'closed');
+        break;
+      case 'overdue':
+        list = list.filter(isOverdue);
+        break;
+    }
+
+    return list;
+  }, [activeStatus, activeLevel, activeFloor, hazards, dashboardView]);
+
+  const hasActiveFilter = activeStatus !== 'all' || activeLevel !== 'all' || activeFloor !== '全部' || dashboardView !== null;
 
   const resetFilters = () => {
     handleStatusChange('all');
     handleLevelChange('all');
     handleFloorChange('全部');
+    setDashboardView(null);
   };
+
+  const dashboardViewLabel = (() => {
+    switch (dashboardView) {
+      case 'new': return '今日新增';
+      case 'pending_rectify': return '待整改';
+      case 'review_fail': return '复查不合格';
+      case 'closed': return '已关闭';
+      case 'overdue': return '逾期未处理';
+      default: return null;
+    }
+  })();
 
   return (
     <View className={styles.container}>
+      {dashboardViewLabel && (
+        <View className={styles.viewTag}>
+          <Text className={styles.viewTagText}>看板筛选：{dashboardViewLabel}</Text>
+          <Text className={styles.viewTagClear} onClick={resetFilters}>清除</Text>
+        </View>
+      )}
+
       <View className={styles.filterBar}>
         <ScrollView className={styles.statusScroll} scrollX enhanced showScrollbar={false}>
           <View className={styles.statusRow}>
             {statusFilters.map(f => (
               <View
                 key={f.key}
-                className={classnames(styles.filterBtn, activeStatus === f.key && styles.filterBtnActive)}
+                className={classnames(styles.filterBtn, activeStatus === f.key && !dashboardView && styles.filterBtnActive)}
                 onClick={() => handleStatusChange(f.key)}
               >
-                <Text className={classnames(styles.filterText, activeStatus === f.key && styles.filterTextActive)}>
+                <Text className={classnames(styles.filterText, activeStatus === f.key && !dashboardView && styles.filterTextActive)}>
                   {f.label}
                 </Text>
               </View>
@@ -96,7 +179,7 @@ const HazardPage: React.FC = () => {
           onClick={() => setShowFilter(!showFilter)}
         >
           <Text className={styles.filterToggleText}>
-            筛选{hasActiveFilter ? `(${[activeStatus !== 'all' ? '状态' : '', activeLevel !== 'all' ? '风险' : '', activeFloor !== '全部' ? '楼层' : ''].filter(Boolean).join('+')})` : ''}
+            筛选{hasActiveFilter ? `(${[dashboardViewLabel, activeStatus !== 'all' ? '状态' : '', activeLevel !== 'all' ? '风险' : '', activeFloor !== '全部' ? '楼层' : ''].filter(Boolean).join('+')})` : ''}
           </Text>
         </View>
       </View>

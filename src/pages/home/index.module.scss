@@ -90,6 +90,88 @@
   color: rgba(255, 255, 255, 0.8);
 }
 
+.loopBoard {
+  margin: -$spacing-lg $page-padding 0;
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $shadow-card;
+  position: relative;
+  z-index: 2;
+}
+
+.boardHeader {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: $spacing-lg;
+}
+
+.boardTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.boardSubtitle {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.boardMain {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: $spacing-sm;
+}
+
+.boardItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: $spacing-sm 0;
+  background: $color-bg-page;
+  border-radius: $radius-md;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.9;
+    transform: scale(0.97);
+  }
+}
+
+.boardValue {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  margin-bottom: 4rpx;
+}
+
+.boardValueNew {
+  color: #2B5FD9;
+}
+
+.boardValuePending {
+  color: #FF7D00;
+}
+
+.boardValueFail {
+  color: #F53F3F;
+}
+
+.boardValueClosed {
+  color: #00B42A;
+}
+
+.boardValueOverdue {
+  color: #86909C;
+  text-decoration: line-through;
+  color: #F53F3F;
+}
+
+.boardLabel {
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+}
+
 .section {
   padding: 0 $page-padding;
   margin-top: $spacing-lg;
@@ -198,6 +280,10 @@
 
 .alertIcon {
   font-size: 40rpx;
+}
+
+.alertCardInfo {
+  background: linear-gradient(135deg, #2B5FD9 0%, #4C8DFF 100%);
 }
 
 .hazardList {
