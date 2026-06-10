@@ -94,6 +94,43 @@
   white-space: nowrap;
 }
 
+.anomalyTag {
+  padding: 6rpx 16rpx;
+  border-radius: $radius-round;
+
+  &:active {
+    opacity: 0.9;
+  }
+}
+
+.anomalyTagOpen {
+  background: rgba(245, 63, 63, 0.1);
+}
+
+.anomalyTagClosed {
+  background: rgba(0, 180, 42, 0.1);
+}
+
+.anomalyTagText {
+  font-size: $font-size-xs;
+  white-space: nowrap;
+}
+
+.anomalyTagOpen .anomalyTagText {
+  color: $color-risk-high;
+}
+
+.anomalyTagClosed .anomalyTagText {
+  color: $color-success;
+}
+
+.reportRoute {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  display: block;
+  margin-bottom: $spacing-md;
+}
+
 .checkBtn {
   padding: 8rpx 24rpx;
   border-radius: $radius-round;

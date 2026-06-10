@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import Taro from '@tarojs/taro';
-import { HazardItem, InspectionRoute, EquipmentItem, TrainingItem, MessageItem, HazardLevel, HazardType, HazardStatus, UserRole } from '@/types';
+import { HazardItem, InspectionRoute, EquipmentItem, TrainingItem, MessageItem, TimelineEntry, HazardLevel, HazardType, HazardStatus, UserRole } from '@/types';
 import { hazardList } from '@/data/hazard';
 import { inspectionRoutes } from '@/data/inspection';
 import { equipmentList } from '@/data/equipment';
@@ -14,7 +14,7 @@ interface AppState {
   trainings: TrainingItem[];
   messages: MessageItem[];
 
-  addHazard: (h: Omit<HazardItem, 'id' | 'reporter' | 'reporterRole' | 'reportTime' | 'status'> & {
+  addHazard: (h: Omit<HazardItem, 'id' | 'reporter' | 'reporterRole' | 'reportTime' | 'status' | 'timeline'> & {
     type: HazardType;
     level: HazardLevel;
     location: string;
@@ -24,6 +24,7 @@ interface AppState {
     sourcePointId?: string;
     sourceRouteId?: string;
     sourcePointName?: string;
+    sourceRouteName?: string;
   }) => void;
 
   updateHazardRectify: (id: string, patch: {
@@ -33,6 +34,10 @@ interface AppState {
     reviewResult?: 'pass' | 'fail' | '';
     reviewNote?: string;
   }) => void;
+
+  addTimelineEntry: (hazardId: string, entry: { action: string; operator: string; remark?: string; imageUrl?: string }) => void;
+
+  closeHazard: (id: string) => void;
 
   getHazardById: (id: string) => HazardItem | undefined;
 
@@ -52,7 +57,7 @@ interface AppState {
   checkOverdue: () => void;
 }
 
-const STORAGE_KEY = 'fire_mgmt_store_v2';
+const STORAGE_KEY = 'fire_mgmt_store_v3';
 
 const nowStr = () => {
   const n = new Date();
@@ -110,8 +115,34 @@ const addMessageInternal = (
   return [newMsg, ...msgs];
 };
 
+const makeTimelineEntry = (action: string, operator: string, remark?: string, imageUrl?: string): TimelineEntry => ({
+  id: `TL${Date.now().toString().slice(-6)}${Math.random().toString(36).slice(2, 5)}`,
+  action,
+  operator,
+  time: nowStr(),
+  remark,
+  imageUrl,
+});
+
+const ensureTimeline = (h: HazardItem): HazardItem => {
+  if (h.timeline && h.timeline.length > 0) return h;
+  const entries: TimelineEntry[] = [
+    makeTimelineEntry('隐患上报', h.reporter, h.description, h.imageUrl),
+  ];
+  if (h.inspector) {
+    entries.push(makeTimelineEntry('受理派单', h.inspector, `指派 ${h.inspector} 处理`));
+  }
+  if (h.rectifyRequirement) {
+    entries.push(makeTimelineEntry('开始整改', h.inspector || '整改人员', h.rectifyRequirement));
+  }
+  if (h.rectifyResult) {
+    entries.push(makeTimelineEntry('复查验收', '复查人员', h.rectifyResult));
+  }
+  return { ...h, timeline: entries };
+};
+
 export const useAppStore = create<AppState>((set, get) => ({
-  hazards: persisted?.hazards ?? hazardList,
+  hazards: (persisted?.hazards ?? hazardList).map(ensureTimeline),
   inspections: persisted?.inspections ?? inspectionRoutes,
   equipments: persisted?.equipments ?? equipmentList,
   trainings: persisted?.trainings ?? trainingList,
@@ -119,6 +150,10 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   addHazard: (payload) => {
     const newId = `HZ${Date.now().toString().slice(-6)}`;
+    const initialEntry = makeTimelineEntry('隐患上报', '当前用户', payload.description, payload.imageUrl);
+    if (payload.sourcePointName) {
+      initialEntry.remark = `来源：巡检路线「${payload.sourceRouteName || ''}」点位「${payload.sourcePointName}」`;
+    }
     const newHazard: HazardItem = {
       id: newId,
       title: payload.description.slice(0, 20) || '隐患上报',
@@ -127,10 +162,13 @@ export const useAppStore = create<AppState>((set, get) => ({
       reporterRole: 'tenant' as UserRole,
       reportTime: nowStr(),
       ...payload,
+      timeline: [initialEntry],
     };
 
     set(s => {
       let newMessages = s.messages;
+      let newInspections = s.inspections;
+
       if (payload.level === 'high') {
         const src = payload.sourcePointName
           ? `（来源：巡检-${payload.sourcePointName}）`
@@ -149,8 +187,23 @@ export const useAppStore = create<AppState>((set, get) => ({
           `巡检点位「${payload.sourcePointName}」发现异常，已自动生成隐患记录`,
           newId, 'hazard'
         );
+
+        if (payload.sourceRouteId && payload.sourcePointId) {
+          newInspections = newInspections.map(r => {
+            if (r.id !== payload.sourceRouteId) return r;
+            return {
+              ...r,
+              points: r.points.map(p =>
+                p.id === payload.sourcePointId
+                  ? { ...p, anomalyHazardId: newId, anomalyClosed: false }
+                  : p
+              ),
+            };
+          });
+        }
       }
-      const nextState = { hazards: [newHazard, ...s.hazards], messages: newMessages };
+
+      const nextState = { hazards: [newHazard, ...s.hazards], messages: newMessages, inspections: newInspections };
       persist(nextState);
       return nextState;
     });
@@ -164,11 +217,13 @@ export const useAppStore = create<AppState>((set, get) => ({
         let status: HazardStatus = h.status;
         let rectifyResult = h.rectifyResult;
         let reviewTime = h.reviewTime;
+        const newTimeline = [...h.timeline];
 
         if (patch.reviewResult === 'pass') {
           status = 'rectified';
           rectifyResult = patch.reviewNote || '复查合格';
           reviewTime = nowStr();
+          newTimeline.push(makeTimelineEntry('复查合格', '复查人员', patch.reviewNote || '复查合格'));
           newMessages = addMessageInternal(
             newMessages, 'rectify', 'important',
             '整改完成通知',
@@ -178,6 +233,7 @@ export const useAppStore = create<AppState>((set, get) => ({
         } else if (patch.reviewResult === 'fail') {
           status = 'processing';
           rectifyResult = patch.reviewNote || '复查不合格，需重新整改';
+          newTimeline.push(makeTimelineEntry('复查不合格', '复查人员', patch.reviewNote || '复查不合格，需重新整改'));
           newMessages = addMessageInternal(
             newMessages, 'rectify', 'urgent',
             '复查不合格提醒',
@@ -186,6 +242,7 @@ export const useAppStore = create<AppState>((set, get) => ({
           );
         } else if (patch.rectifyRequirement) {
           status = 'processing';
+          newTimeline.push(makeTimelineEntry('受理派单', patch.inspector || '当前巡检员', `指派 ${patch.inspector || '整改人员'} 处理，要求：${patch.rectifyRequirement}，期限：${patch.deadline}`));
           newMessages = addMessageInternal(
             newMessages, 'rectify', 'important',
             '新整改任务',
@@ -202,9 +259,55 @@ export const useAppStore = create<AppState>((set, get) => ({
           rectifyResult,
           reviewTime,
           status,
+          timeline: newTimeline,
         };
       });
       const nextState = { hazards, messages: newMessages };
+      persist(nextState);
+      return nextState;
+    });
+  },
+
+  addTimelineEntry: (hazardId, entry) => {
+    set(s => {
+      const hazards = s.hazards.map(h => {
+        if (h.id !== hazardId) return h;
+        return {
+          ...h,
+          timeline: [...h.timeline, makeTimelineEntry(entry.action, entry.operator, entry.remark, entry.imageUrl)],
+        };
+      });
+      const nextState = { hazards };
+      persist(nextState);
+      return nextState;
+    });
+  },
+
+  closeHazard: (id) => {
+    set(s => {
+      let newInspections = s.inspections;
+      const hazards = s.hazards.map(h => {
+        if (h.id !== id) return h;
+        const newTimeline = [...h.timeline, makeTimelineEntry('关闭隐患', '当前用户', '隐患已关闭')];
+
+        if (h.sourceRouteId && h.sourcePointId) {
+          newInspections = newInspections.map(r => {
+            if (r.id !== h.sourceRouteId) return r;
+            return {
+              ...r,
+              points: r.points.map(p =>
+                p.id === h.sourcePointId && p.anomalyHazardId === id
+                  ? { ...p, anomalyClosed: true }
+                  : p
+              ),
+            };
+          });
+        }
+
+        return { ...h, status: 'closed' as HazardStatus, timeline: newTimeline };
+      });
+
+      const nextState = { hazards, inspections: newInspections };
       persist(nextState);
       return nextState;
     });

@@ -80,11 +80,14 @@ const InspectCheckPage: React.FC = () => {
       sourcePointId: reportingPointId,
       sourceRouteId: routeId,
       sourcePointName: point.name,
+      sourceRouteName: route.name,
     });
 
     setReportingPointId(null);
     setReportRemark('');
     setReportImageUrl('');
+    const r = getRouteById(routeId);
+    if (r) setRoute(r);
     Taro.showToast({ title: '异常已上报', icon: 'success' });
   };
 
@@ -132,17 +135,35 @@ const InspectCheckPage: React.FC = () => {
       <View className={styles.pointList}>
         {route.points.map(point => {
           const isChecked = point.checked;
+          const hasAnomaly = !!point.anomalyHazardId;
+          const anomalyClosed = !!point.anomalyClosed;
           return (
             <View key={point.id} className={styles.pointCard}>
               <View className={styles.pointHeader}>
                 <Text className={styles.pointName}>{point.name}</Text>
                 <View className={styles.pointActions}>
-                  <View
-                    className={classnames(styles.reportBtn)}
-                    onClick={() => handleReportAnomaly(point.id)}
-                  >
-                    <Text className={styles.reportBtnText}>异常上报</Text>
-                  </View>
+                  {!hasAnomaly && (
+                    <View
+                      className={classnames(styles.reportBtn)}
+                      onClick={() => handleReportAnomaly(point.id)}
+                    >
+                      <Text className={styles.reportBtnText}>异常上报</Text>
+                    </View>
+                  )}
+                  {hasAnomaly && (
+                    <View
+                      className={classnames(styles.anomalyTag, anomalyClosed ? styles.anomalyTagClosed : styles.anomalyTagOpen)}
+                      onClick={() => {
+                        if (point.anomalyHazardId) {
+                          Taro.navigateTo({ url: `/pages/hazard/detail/index?id=${point.anomalyHazardId}` });
+                        }
+                      }}
+                    >
+                      <Text className={styles.anomalyTagText}>
+                        {anomalyClosed ? '已闭环' : '待处理'}
+                      </Text>
+                    </View>
+                  )}
                   <View
                     className={classnames(styles.checkBtn, isChecked ? styles.checkBtnDone : styles.checkBtnPending)}
                     onClick={() => handleCheck(point.id)}
@@ -154,7 +175,7 @@ const InspectCheckPage: React.FC = () => {
                 </View>
               </View>
               <View className={styles.pointInfo}>
-                <Text className={styles.pointLocation}>{point.location}</Text>
+                <Text className={styles.pointLocation}>{point.floor} · {point.location}</Text>
                 {point.checkTime && <Text className={styles.pointTime}>{point.checkTime}</Text>}
               </View>
               {point.remark && <Text className={styles.pointRemark}>{point.remark}</Text>}
@@ -169,6 +190,9 @@ const InspectCheckPage: React.FC = () => {
             <Text className={styles.reportTitle}>异常上报</Text>
             <Text className={styles.reportPoint}>
               点位：{route.points.find(p => p.id === reportingPointId)?.name}
+            </Text>
+            <Text className={styles.reportRoute}>
+              路线：{route.name} · 楼层：{route.points.find(p => p.id === reportingPointId)?.floor}
             </Text>
             <View className={styles.imageRow} onClick={handleChooseImage}>
               {reportImageUrl ? (

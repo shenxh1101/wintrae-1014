@@ -4,6 +4,15 @@ export type HazardStatus = 'pending' | 'processing' | 'rectified' | 'closed';
 export type HazardLevel = 'high' | 'medium' | 'low';
 export type HazardType = 'channel_block' | 'illegal_power' | 'extinguisher_missing' | 'fire_door' | 'other';
 
+export interface TimelineEntry {
+  id: string;
+  action: string;
+  operator: string;
+  time: string;
+  remark?: string;
+  imageUrl?: string;
+}
+
 export interface HazardItem {
   id: string;
   title: string;
@@ -25,6 +34,8 @@ export interface HazardItem {
   sourcePointId?: string;
   sourceRouteId?: string;
   sourcePointName?: string;
+  sourceRouteName?: string;
+  timeline: TimelineEntry[];
 }
 
 export interface InspectionPoint {
@@ -36,6 +47,8 @@ export interface InspectionPoint {
   checkTime?: string;
   remark?: string;
   imageUrl?: string;
+  anomalyHazardId?: string;
+  anomalyClosed?: boolean;
 }
 
 export interface InspectionRoute {

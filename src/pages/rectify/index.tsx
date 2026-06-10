@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, Input, Textarea } from '@tarojs/components';
+import { View, Text, Input, Textarea, Image } from '@tarojs/components';
 import Taro, { useRouter, useDidShow } from '@tarojs/taro';
 import { hazardTypeMap, hazardLevelMap } from '@/data/hazard';
 import { useAppStore } from '@/store';
@@ -12,6 +12,7 @@ const RectifyPage: React.FC = () => {
   const id = router.params.id || 'HZ001';
   const getHazardById = useAppStore(s => s.getHazardById);
   const updateHazardRectify = useAppStore(s => s.updateHazardRectify);
+  const addTimelineEntry = useAppStore(s => s.addTimelineEntry);
 
   const [hazard, setHazard] = useState(() => getHazardById(id));
   const [requirement, setRequirement] = useState(hazard?.rectifyRequirement || '');
@@ -19,6 +20,8 @@ const RectifyPage: React.FC = () => {
   const [inspector, setInspector] = useState(hazard?.inspector || '');
   const [reviewResult, setReviewResult] = useState<'pass' | 'fail' | ''>('');
   const [reviewNote, setReviewNote] = useState('');
+  const [supplementRemark, setSupplementRemark] = useState('');
+  const [supplementImage, setSupplementImage] = useState('');
 
   useDidShow(() => {
     const h = getHazardById(id);
@@ -40,6 +43,17 @@ const RectifyPage: React.FC = () => {
     );
   }
 
+  const handleChooseImage = () => {
+    Taro.chooseImage({
+      count: 1,
+      sizeType: ['compressed'],
+      sourceType: ['album', 'camera'],
+      success: (res) => {
+        setSupplementImage(res.tempFilePaths[0]);
+      }
+    });
+  };
+
   const handleSubmit = () => {
     if (hazard.status === 'pending') {
       if (!requirement.trim()) {
@@ -55,6 +69,14 @@ const RectifyPage: React.FC = () => {
         deadline,
         inspector: inspector || '当前巡检员',
       });
+      if (supplementRemark.trim() || supplementImage) {
+        addTimelineEntry(id, {
+          action: '整改补充',
+          operator: inspector || '当前巡检员',
+          remark: supplementRemark,
+          imageUrl: supplementImage || undefined,
+        });
+      }
       Taro.showToast({ title: '整改已提交', icon: 'success' });
     } else if (hazard.status === 'processing') {
       if (!reviewResult) {
@@ -68,6 +90,14 @@ const RectifyPage: React.FC = () => {
         reviewResult,
         reviewNote,
       });
+      if (supplementRemark.trim() || supplementImage) {
+        addTimelineEntry(id, {
+          action: '复查补充',
+          operator: '复查人员',
+          remark: supplementRemark,
+          imageUrl: supplementImage || undefined,
+        });
+      }
       Taro.showToast({ title: reviewResult === 'pass' ? '复查合格' : '需重新整改', icon: 'success' });
     }
 
@@ -154,6 +184,31 @@ const RectifyPage: React.FC = () => {
           </View>
         </View>
       )}
+
+      <View className={styles.formSection}>
+        <Text className={styles.formTitle}>补充信息（可选）</Text>
+        <View className={styles.formItem}>
+          <Text className={styles.formLabel}>补充备注</Text>
+          <Textarea
+            className={styles.formTextArea}
+            placeholder="补充备注、现场说明等"
+            value={supplementRemark}
+            onInput={e => setSupplementRemark(e.detail.value)}
+          />
+        </View>
+        <View className={styles.formItem}>
+          <Text className={styles.formLabel}>补充照片</Text>
+          <View className={styles.imageRow} onClick={handleChooseImage}>
+            {supplementImage ? (
+              <Image className={styles.supplementPreview} src={supplementImage} mode="aspectFill" />
+            ) : (
+              <View className={styles.addImageBtn}>
+                <Text className={styles.addImageText}>+ 拍照/选图</Text>
+              </View>
+            )}
+          </View>
+        </View>
+      </View>
 
       <View className={styles.bottomBar}>
         <View className={styles.submitBtn} onClick={handleSubmit}>

@@ -175,3 +175,29 @@
   font-weight: $font-weight-medium;
   color: $color-text-white;
 }
+
+.imageRow {
+  margin-top: $spacing-sm;
+}
+
+.addImageBtn {
+  width: 160rpx;
+  height: 160rpx;
+  border: 2rpx dashed $color-divider;
+  border-radius: $radius-sm;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: $color-bg-page;
+}
+
+.addImageText {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
+.supplementPreview {
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: $radius-sm;
+}

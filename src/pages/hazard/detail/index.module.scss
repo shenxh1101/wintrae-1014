@@ -71,6 +71,25 @@
   font-weight: $font-weight-medium;
 }
 
+.sourceInfo {
+  background: rgba(43, 95, 217, 0.08);
+  border-radius: $radius-sm;
+  padding: $spacing-md;
+  margin-bottom: $spacing-md;
+}
+
+.sourceLabel {
+  font-size: $font-size-sm;
+  color: $color-secondary;
+  font-weight: $font-weight-medium;
+  margin-bottom: 4rpx;
+}
+
+.sourceValue {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+}
+
 .descTitle {
   font-size: $font-size-md;
   font-weight: $font-weight-medium;
@@ -92,11 +111,33 @@
   margin-bottom: $spacing-md;
 }
 
+.timelineHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-lg;
+}
+
 .timelineTitle {
   font-size: $font-size-lg;
   font-weight: $font-weight-semibold;
   color: $color-text-primary;
-  margin-bottom: $spacing-lg;
+}
+
+.addNoteBtn {
+  padding: 6rpx 16rpx;
+  border-radius: $radius-round;
+  background: rgba(43, 95, 217, 0.1);
+
+  &:active {
+    opacity: 0.9;
+  }
+}
+
+.addNoteText {
+  font-size: $font-size-xs;
+  color: $color-secondary;
+  white-space: nowrap;
 }
 
 .timeline {
@@ -129,22 +170,46 @@
   background: $color-primary;
 }
 
+.timelineContent {
+  flex: 1;
+}
+
+.timelineTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $spacing-sm;
+}
+
 .timelineLabel {
   font-size: $font-size-md;
   font-weight: $font-weight-medium;
   color: $color-text-primary;
-  margin-bottom: 4rpx;
 }
 
 .timelineTime {
   font-size: $font-size-xs;
   color: $color-text-disabled;
+  white-space: nowrap;
+}
+
+.timelineOperator {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  margin-top: 2rpx;
 }
 
 .timelineDesc {
   font-size: $font-size-sm;
   color: $color-text-secondary;
   margin-top: 4rpx;
+}
+
+.timelineImage {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: $radius-sm;
+  margin-top: $spacing-xs;
 }
 
 .rectifyCard {
@@ -182,6 +247,118 @@
   font-size: $font-size-sm;
   color: $color-text-primary;
   flex: 1;
+}
+
+.noteModal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: $spacing-xl $page-padding;
+}
+
+.noteContent {
+  width: 100%;
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-xl;
+}
+
+.noteTitle {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: $color-text-primary;
+  display: block;
+  margin-bottom: $spacing-lg;
+}
+
+.noteImageRow {
+  margin-bottom: $spacing-md;
+}
+
+.noteAddImage {
+  width: 160rpx;
+  height: 160rpx;
+  border: 2rpx dashed $color-divider;
+  border-radius: $radius-sm;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: $color-bg-page;
+}
+
+.noteAddImageText {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
+.notePreview {
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: $radius-sm;
+}
+
+.noteInput {
+  width: 100%;
+  min-height: 160rpx;
+  background: $color-bg-page;
+  border-radius: $radius-sm;
+  padding: $spacing-md;
+  font-size: $font-size-md;
+  color: $color-text-primary;
+  margin-bottom: $spacing-lg;
+  box-sizing: border-box;
+}
+
+.noteBtns {
+  display: flex;
+  gap: $spacing-md;
+}
+
+.noteCancelBtn {
+  flex: 1;
+  height: $button-height-lg;
+  border-radius: $radius-button;
+  background: $color-bg-page;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:active {
+    opacity: 0.9;
+  }
+}
+
+.noteCancelText {
+  font-size: $font-size-md;
+  color: $color-text-secondary;
+}
+
+.noteSubmitBtn {
+  flex: 1;
+  height: $button-height-lg;
+  border-radius: $radius-button;
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:active {
+    opacity: 0.9;
+    transform: scale(0.98);
+  }
+}
+
+.noteSubmitText {
+  font-size: $font-size-md;
+  color: $color-text-white;
+  font-weight: $font-weight-medium;
 }
 
 .bottomBar {

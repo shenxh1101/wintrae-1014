@@ -45,6 +45,7 @@ const EquipmentPage: React.FC = () => {
       });
     } else {
       setScanResult(`未找到编号「${trimmed}」对应的器材`);
+      setHighlightId(null);
       Taro.showToast({ title: '未找到对应器材', icon: 'none', duration: 2000 });
     }
   };
