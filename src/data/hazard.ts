@@ -1,0 +1,192 @@
+import { HazardItem } from '@/types';
+
+export const hazardList: HazardItem[] = [
+  {
+    id: 'HZ001',
+    title: '安全通道被货物堵塞',
+    type: 'channel_block',
+    level: 'high',
+    status: 'pending',
+    location: 'A区3层301铺位旁',
+    floor: '3F',
+    description: 'A区3层301铺位将大量纸箱堆放在安全通道内，严重影响人员疏散',
+    imageUrl: 'https://picsum.photos/id/1082/300/300',
+    reporter: '王经理',
+    reporterRole: 'tenant',
+    reportTime: '2026-06-09 14:30',
+    deadline: '2026-06-12'
+  },
+  {
+    id: 'HZ002',
+    title: '违规使用大功率电器',
+    type: 'illegal_power',
+    level: 'high',
+    status: 'processing',
+    location: 'B区2层205铺位',
+    floor: '2F',
+    description: 'B区2层205铺位私自接入大功率电暖器，线路存在过载风险',
+    imageUrl: 'https://picsum.photos/id/1/300/300',
+    reporter: '李巡检',
+    reporterRole: 'inspector',
+    reportTime: '2026-06-08 10:15',
+    deadline: '2026-06-11',
+    inspector: '张工',
+    rectifyRequirement: '立即停止使用大功率电器，限期拆除违规线路'
+  },
+  {
+    id: 'HZ003',
+    title: '灭火器缺失',
+    type: 'extinguisher_missing',
+    level: 'medium',
+    status: 'rectified',
+    location: 'C区1层消防柜',
+    floor: '1F',
+    description: 'C区1层西侧消防柜内灭火器缺失2个，需补充',
+    imageUrl: 'https://picsum.photos/id/119/300/300',
+    reporter: '陈租户',
+    reporterRole: 'tenant',
+    reportTime: '2026-06-07 09:00',
+    deadline: '2026-06-10',
+    inspector: '王工',
+    rectifyRequirement: '3日内补齐缺失灭火器',
+    rectifyResult: '已补齐2个4kg干粉灭火器，检查合格',
+    reviewTime: '2026-06-09 16:00'
+  },
+  {
+    id: 'HZ004',
+    title: '防火门被楔住无法关闭',
+    type: 'fire_door',
+    level: 'medium',
+    status: 'processing',
+    location: 'A区4层楼梯间',
+    floor: '4F',
+    description: 'A区4层东侧楼梯间防火门被灭火器楔住，无法自动关闭',
+    imageUrl: 'https://picsum.photos/id/3/300/300',
+    reporter: '赵巡检',
+    reporterRole: 'inspector',
+    reportTime: '2026-06-09 08:45',
+    deadline: '2026-06-11',
+    inspector: '张工',
+    rectifyRequirement: '移除楔物，确保防火门自动关闭功能正常'
+  },
+  {
+    id: 'HZ005',
+    title: '疏散指示灯故障',
+    type: 'other',
+    level: 'low',
+    status: 'closed',
+    location: 'B区1层走廊',
+    floor: '1F',
+    description: 'B区1层西侧走廊疏散指示灯不亮',
+    imageUrl: 'https://picsum.photos/id/160/300/300',
+    reporter: '刘租户',
+    reporterRole: 'tenant',
+    reportTime: '2026-06-05 11:20',
+    inspector: '王工',
+    rectifyRequirement: '更换故障指示灯',
+    rectifyResult: '已更换新指示灯，测试正常',
+    reviewTime: '2026-06-06 14:30'
+  },
+  {
+    id: 'HZ006',
+    title: '消防通道停放电动车',
+    type: 'channel_block',
+    level: 'high',
+    status: 'pending',
+    location: 'A区1层北门通道',
+    floor: '1F',
+    description: 'A区1层北门消防通道停放了3辆电动车，阻塞通道',
+    imageUrl: 'https://picsum.photos/id/201/300/300',
+    reporter: '孙租户',
+    reporterRole: 'tenant',
+    reportTime: '2026-06-10 07:50',
+    deadline: '2026-06-11'
+  },
+  {
+    id: 'HZ007',
+    title: '配电房门未上锁',
+    type: 'other',
+    level: 'medium',
+    status: 'pending',
+    location: 'B区地下1层配电房',
+    floor: 'B1',
+    description: 'B区地下1层配电房门锁损坏，门未上锁存在安全隐患',
+    imageUrl: 'https://picsum.photos/id/6/300/300',
+    reporter: '周巡检',
+    reporterRole: 'inspector',
+    reportTime: '2026-06-10 09:10',
+    deadline: '2026-06-13'
+  },
+  {
+    id: 'HZ008',
+    title: '应急照明灯故障',
+    type: 'other',
+    level: 'low',
+    status: 'rectified',
+    location: 'C区2层洗手间旁',
+    floor: '2F',
+    description: 'C区2层洗手间旁应急照明灯断电后不亮',
+    imageUrl: 'https://picsum.photos/id/8/300/300',
+    reporter: '吴租户',
+    reporterRole: 'tenant',
+    reportTime: '2026-06-06 15:30',
+    deadline: '2026-06-09',
+    inspector: '李工',
+    rectifyRequirement: '更换应急照明灯电池',
+    rectifyResult: '已更换电池，断电测试正常',
+    reviewTime: '2026-06-08 11:00'
+  },
+  {
+    id: 'HZ009',
+    title: '烟感报警器遮挡',
+    type: 'other',
+    level: 'high',
+    status: 'processing',
+    location: 'A区5层美食广场',
+    floor: '5F',
+    description: 'A区5层美食广场多个烟感报警器被装饰物遮挡，影响感应',
+    imageUrl: 'https://picsum.photos/id/9/300/300',
+    reporter: '郑巡检',
+    reporterRole: 'inspector',
+    reportTime: '2026-06-09 16:20',
+    deadline: '2026-06-12',
+    inspector: '张工',
+    rectifyRequirement: '拆除遮挡物，确保烟感报警器周围50cm无遮挡'
+  },
+  {
+    id: 'HZ010',
+    title: '消火栓箱内杂物堆放',
+    type: 'extinguisher_missing',
+    level: 'medium',
+    status: 'pending',
+    location: 'B区3层东侧',
+    floor: '3F',
+    description: 'B区3层东侧消火栓箱内存放清洁工具，影响紧急使用',
+    imageUrl: 'https://picsum.photos/id/2/300/300',
+    reporter: '钱租户',
+    reporterRole: 'tenant',
+    reportTime: '2026-06-10 10:05',
+    deadline: '2026-06-13'
+  }
+];
+
+export const hazardTypeMap: Record<string, string> = {
+  channel_block: '通道堵塞',
+  illegal_power: '违规用电',
+  extinguisher_missing: '灭火器缺失',
+  fire_door: '防火门故障',
+  other: '其他隐患'
+};
+
+export const hazardLevelMap: Record<string, string> = {
+  high: '高风险',
+  medium: '中风险',
+  low: '低风险'
+};
+
+export const hazardStatusMap: Record<string, string> = {
+  pending: '待处理',
+  processing: '整改中',
+  rectified: '已整改',
+  closed: '已关闭'
+};

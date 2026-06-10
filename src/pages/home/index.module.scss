@@ -1,0 +1,205 @@
+@use '@/styles/variables.scss' as *;
+
+.container {
+  min-height: 100vh;
+  background: $color-bg-page;
+  padding-bottom: 120rpx;
+}
+
+.header {
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  padding: 40rpx $page-padding 48rpx;
+  border-radius: 0 0 $radius-xl $radius-xl;
+}
+
+.greeting {
+  font-size: $font-size-xxl;
+  font-weight: $font-weight-bold;
+  color: $color-text-white;
+  margin-bottom: $spacing-xs;
+}
+
+.roleSwitch {
+  display: flex;
+  align-items: center;
+  margin-bottom: $spacing-lg;
+}
+
+.roleBtn {
+  padding: 8rpx 24rpx;
+  border-radius: $radius-round;
+  margin-right: $spacing-sm;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.9;
+  }
+}
+
+.roleBtnActive {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.roleBtnInactive {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.roleText {
+  font-size: $font-size-sm;
+  white-space: nowrap;
+}
+
+.roleTextActive {
+  color: $color-text-white;
+  font-weight: $font-weight-medium;
+}
+
+.roleTextInactive {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.statsGrid {
+  display: flex;
+  justify-content: space-between;
+  gap: $spacing-sm;
+}
+
+.statItem {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: $radius-md;
+  padding: $spacing-md 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.statValue {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: $color-text-white;
+  margin-bottom: 4rpx;
+}
+
+.statValueUrgent {
+  color: #FFE066;
+}
+
+.statLabel {
+  font-size: $font-size-xs;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.section {
+  padding: 0 $page-padding;
+  margin-top: $spacing-lg;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-md;
+}
+
+.sectionTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.sectionMore {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
+.quickActions {
+  display: flex;
+  justify-content: space-between;
+  gap: $spacing-md;
+}
+
+.actionItem {
+  flex: 1;
+  background: $color-bg-card;
+  border-radius: $radius-md;
+  padding: $spacing-md 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: $shadow-card;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.9;
+    transform: scale(0.98);
+  }
+}
+
+.actionIcon {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: $radius-md;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: $spacing-sm;
+  font-size: 36rpx;
+}
+
+.actionIconReport {
+  background: rgba(245, 63, 63, 0.1);
+}
+
+.actionIconInspect {
+  background: rgba(22, 93, 255, 0.1);
+}
+
+.actionIconEquip {
+  background: rgba(0, 180, 42, 0.1);
+}
+
+.actionIconTrain {
+  background: rgba(255, 125, 0, 0.1);
+}
+
+.actionName {
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+  font-weight: $font-weight-medium;
+}
+
+.alertCard {
+  background: linear-gradient(135deg, $color-risk-high 0%, #ff6b6b 100%);
+  border-radius: $radius-md;
+  padding: $spacing-md;
+  box-shadow: $shadow-card;
+  display: flex;
+  align-items: center;
+  margin-bottom: $spacing-md;
+}
+
+.alertContent {
+  flex: 1;
+  margin-left: $spacing-sm;
+}
+
+.alertTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-white;
+  margin-bottom: 4rpx;
+}
+
+.alertDesc {
+  font-size: $font-size-sm;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.alertIcon {
+  font-size: 40rpx;
+}
+
+.hazardList {
+  margin-top: 0;
+}

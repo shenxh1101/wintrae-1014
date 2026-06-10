@@ -1,0 +1,131 @@
+@use '@/styles/variables.scss' as *;
+
+.container {
+  min-height: 100vh;
+  background: $color-bg-page;
+  padding-bottom: 120rpx;
+}
+
+.header {
+  background: linear-gradient(135deg, $color-warning 0%, #ffaa33 100%);
+  padding: $spacing-lg $page-padding;
+  border-radius: 0 0 $radius-xl $radius-xl;
+}
+
+.headerTitle {
+  font-size: $font-size-xxl;
+  font-weight: $font-weight-bold;
+  color: $color-text-white;
+  margin-bottom: $spacing-sm;
+}
+
+.headerDesc {
+  font-size: $font-size-md;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.list {
+  padding: $spacing-md $page-padding 0;
+}
+
+.trainCard {
+  background: $color-bg-card;
+  border-radius: $radius-md;
+  padding: $spacing-lg;
+  box-shadow: $shadow-card;
+  margin-bottom: $spacing-md;
+}
+
+.trainHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: $spacing-md;
+}
+
+.trainTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  flex: 1;
+  margin-right: $spacing-sm;
+  line-height: $line-height-tight;
+}
+
+.signBtn {
+  padding: 8rpx 24rpx;
+  border-radius: $radius-round;
+  flex-shrink: 0;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.9;
+  }
+}
+
+.signBtnActive {
+  background: linear-gradient(135deg, $color-warning 0%, #ffaa33 100%);
+}
+
+.signBtnDone {
+  background: rgba(0, 180, 42, 0.1);
+}
+
+.signBtnText {
+  font-size: $font-size-sm;
+  white-space: nowrap;
+}
+
+.signBtnTextActive {
+  color: $color-text-white;
+  font-weight: $font-weight-medium;
+}
+
+.signBtnTextDone {
+  color: $color-success;
+}
+
+.trainInfo {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+}
+
+.trainInfoRow {
+  display: flex;
+  align-items: center;
+}
+
+.trainInfoIcon {
+  font-size: $font-size-sm;
+  margin-right: $spacing-xs;
+}
+
+.trainInfoText {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
+.signedTime {
+  font-size: $font-size-xs;
+  color: $color-success;
+  margin-top: $spacing-xs;
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 120rpx 0;
+}
+
+.emptyIcon {
+  font-size: 80rpx;
+  margin-bottom: $spacing-md;
+}
+
+.emptyText {
+  font-size: $font-size-md;
+  color: $color-text-tertiary;
+}

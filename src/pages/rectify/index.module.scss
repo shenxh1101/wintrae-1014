@@ -1,0 +1,177 @@
+@use '@/styles/variables.scss' as *;
+
+.container {
+  min-height: 100vh;
+  background: $color-bg-page;
+  padding-bottom: 180rpx;
+}
+
+.hazardInfo {
+  background: $color-bg-card;
+  margin: $spacing-md $page-padding;
+  border-radius: $radius-md;
+  padding: $spacing-lg;
+  box-shadow: $shadow-card;
+}
+
+.hazardTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-sm;
+}
+
+.hazardMeta {
+  display: flex;
+  gap: $spacing-lg;
+  margin-bottom: $spacing-sm;
+}
+
+.metaItem {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
+.hazardDesc {
+  font-size: $font-size-md;
+  color: $color-text-secondary;
+  line-height: $line-height-loose;
+}
+
+.formSection {
+  background: $color-bg-card;
+  margin: 0 $page-padding $spacing-md;
+  border-radius: $radius-md;
+  padding: $spacing-lg;
+  box-shadow: $shadow-card;
+}
+
+.formTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-lg;
+}
+
+.formItem {
+  margin-bottom: $spacing-lg;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.formLabel {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  margin-bottom: $spacing-sm;
+}
+
+.formRequired {
+  color: $color-risk-high;
+}
+
+.formInput {
+  width: 100%;
+  min-height: 72rpx;
+  padding: 0 $spacing-md;
+  border: 1rpx solid $color-border;
+  border-radius: $radius-sm;
+  font-size: $font-size-md;
+  color: $color-text-primary;
+  background: $color-bg-page;
+  box-sizing: border-box;
+}
+
+.formTextArea {
+  width: 100%;
+  min-height: 200rpx;
+  padding: $spacing-md;
+  border: 1rpx solid $color-border;
+  border-radius: $radius-sm;
+  font-size: $font-size-md;
+  color: $color-text-primary;
+  background: $color-bg-page;
+  box-sizing: border-box;
+}
+
+.resultOptions {
+  display: flex;
+  gap: $spacing-md;
+}
+
+.resultOption {
+  flex: 1;
+  padding: 20rpx 0;
+  border-radius: $radius-sm;
+  text-align: center;
+  border: 2rpx solid transparent;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.9;
+  }
+}
+
+.resultPass {
+  background: rgba(0, 180, 42, 0.1);
+
+  &.resultOptionActive {
+    border-color: $color-success;
+  }
+}
+
+.resultFail {
+  background: rgba(245, 63, 63, 0.1);
+
+  &.resultOptionActive {
+    border-color: $color-risk-high;
+  }
+}
+
+.resultText {
+  font-size: $font-size-md;
+  white-space: nowrap;
+}
+
+.resultTextPass {
+  color: $color-success;
+}
+
+.resultTextFail {
+  color: $color-risk-high;
+}
+
+.bottomBar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: $spacing-md $page-padding;
+  padding-bottom: calc(#{$spacing-md} + env(safe-area-inset-bottom));
+  background: $color-bg-card;
+  box-shadow: 0 -2rpx 12rpx rgba(0, 0, 0, 0.06);
+  z-index: 10;
+}
+
+.submitBtn {
+  width: 100%;
+  height: $button-height-lg;
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  border-radius: $radius-button;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.9;
+    transform: scale(0.98);
+  }
+}
+
+.submitText {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-medium;
+  color: $color-text-white;
+}

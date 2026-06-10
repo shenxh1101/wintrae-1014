@@ -1,0 +1,116 @@
+@use '@/styles/variables.scss' as *;
+
+.item {
+  display: flex;
+  padding: $spacing-md;
+  background: $color-bg-card;
+  border-radius: $radius-md;
+  margin-bottom: $spacing-md;
+  box-shadow: $shadow-card;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.9;
+    transform: scale(0.98);
+  }
+}
+
+.itemUnread {
+  border-left: 6rpx solid $color-primary;
+}
+
+.icon {
+  width: 48rpx;
+  height: 48rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-right: $spacing-md;
+  margin-top: 4rpx;
+}
+
+.iconText {
+  font-size: 32rpx;
+}
+
+.content {
+  flex: 1;
+  min-width: 0;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $spacing-sm;
+  margin-bottom: $spacing-xs;
+}
+
+.title {
+  font-size: $font-size-md;
+  font-weight: $font-weight-normal;
+  color: $color-text-secondary;
+  @include text-ellipsis;
+  flex: 1;
+}
+
+.titleUnread {
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.typeTag {
+  padding: 2rpx 10rpx;
+  border-radius: $radius-xs;
+  flex-shrink: 0;
+}
+
+.typeOverdue {
+  background: rgba(245, 63, 63, 0.1);
+  .typeText { color: $color-risk-high; }
+}
+
+.typeRepeat {
+  background: rgba(255, 125, 0, 0.1);
+  .typeText { color: $color-risk-medium; }
+}
+
+.typeHigh_risk {
+  background: rgba(245, 63, 63, 0.1);
+  .typeText { color: $color-risk-high; }
+}
+
+.typeRectify {
+  background: rgba(232, 85, 58, 0.1);
+  .typeText { color: $color-primary; }
+}
+
+.typeTraining {
+  background: rgba(22, 93, 255, 0.1);
+  .typeText { color: $color-pending; }
+}
+
+.typeSystem {
+  background: #f2f3f5;
+  .typeText { color: $color-text-tertiary; }
+}
+
+.typeText {
+  font-size: $font-size-xs;
+  white-space: nowrap;
+}
+
+.desc {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  line-height: $line-height-normal;
+  @include text-ellipsis-multi(2);
+  display: block;
+  margin-bottom: $spacing-xs;
+}
+
+.time {
+  font-size: $font-size-xs;
+  color: $color-text-disabled;
+}

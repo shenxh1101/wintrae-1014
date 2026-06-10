@@ -1,0 +1,84 @@
+@use '@/styles/variables.scss' as *;
+
+.card {
+  display: flex;
+  background: $color-bg-card;
+  border-radius: $radius-md;
+  padding: $spacing-md;
+  box-shadow: $shadow-card;
+  margin-bottom: $spacing-md;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.9;
+    transform: scale(0.98);
+  }
+}
+
+.image {
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: $radius-sm;
+  flex-shrink: 0;
+  margin-right: $spacing-md;
+}
+
+.content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-width: 0;
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: $spacing-sm;
+}
+
+.title {
+  font-size: $font-size-md;
+  font-weight: $font-weight-medium;
+  color: $color-text-primary;
+  line-height: $line-height-tight;
+  @include text-ellipsis-multi(1);
+  flex: 1;
+}
+
+.info {
+  display: flex;
+  align-items: center;
+  margin-top: $spacing-xs;
+}
+
+.type {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
+.dot {
+  font-size: $font-size-sm;
+  color: $color-text-disabled;
+  margin: 0 $spacing-xs;
+}
+
+.location {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  @include text-ellipsis;
+  flex: 1;
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: $spacing-sm;
+}
+
+.time {
+  font-size: $font-size-xs;
+  color: $color-text-disabled;
+}

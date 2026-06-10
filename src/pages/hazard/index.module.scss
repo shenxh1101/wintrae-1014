@@ -1,0 +1,90 @@
+@use '@/styles/variables.scss' as *;
+
+.container {
+  min-height: 100vh;
+  background: $color-bg-page;
+  padding-bottom: 140rpx;
+}
+
+.filterBar {
+  display: flex;
+  padding: $spacing-md $page-padding;
+  gap: $spacing-sm;
+  background: $color-bg-card;
+  border-bottom: 1rpx solid $color-divider;
+}
+
+.filterBtn {
+  padding: 8rpx 24rpx;
+  border-radius: $radius-round;
+  background: $color-bg-page;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.9;
+  }
+}
+
+.filterBtnActive {
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+}
+
+.filterText {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  white-space: nowrap;
+}
+
+.filterTextActive {
+  color: $color-text-white;
+  font-weight: $font-weight-medium;
+}
+
+.list {
+  padding: $spacing-md $page-padding 0;
+}
+
+.fab {
+  position: fixed;
+  bottom: 180rpx;
+  right: $page-padding;
+  width: 112rpx;
+  height: 112rpx;
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  border-radius: $radius-round;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4rpx 20rpx rgba(232, 85, 58, 0.4);
+  transition: all $transition-base;
+  z-index: 10;
+
+  &:active {
+    opacity: 0.9;
+    transform: scale(0.95);
+  }
+}
+
+.fabText {
+  font-size: 48rpx;
+  color: $color-text-white;
+  line-height: 1;
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 120rpx 0;
+}
+
+.emptyIcon {
+  font-size: 80rpx;
+  margin-bottom: $spacing-md;
+}
+
+.emptyText {
+  font-size: $font-size-md;
+  color: $color-text-tertiary;
+}

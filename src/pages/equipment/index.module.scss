@@ -1,0 +1,194 @@
+@use '@/styles/variables.scss' as *;
+
+.container {
+  min-height: 100vh;
+  background: $color-bg-page;
+  padding-bottom: 120rpx;
+}
+
+.searchBar {
+  padding: $spacing-md $page-padding;
+  background: $color-bg-card;
+  border-bottom: 1rpx solid $color-divider;
+}
+
+.searchInput {
+  width: 100%;
+  height: 72rpx;
+  background: $color-bg-page;
+  border-radius: $radius-round;
+  padding: 0 $spacing-lg;
+  font-size: $font-size-md;
+  color: $color-text-primary;
+  box-sizing: border-box;
+}
+
+.scanBtn {
+  margin: $spacing-md $page-padding;
+  height: $button-height-md;
+  background: linear-gradient(135deg, $color-secondary 0%, $color-secondary-light 100%);
+  border-radius: $radius-button;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-sm;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.9;
+    transform: scale(0.98);
+  }
+}
+
+.scanIcon {
+  font-size: 32rpx;
+}
+
+.scanText {
+  font-size: $font-size-md;
+  font-weight: $font-weight-medium;
+  color: $color-text-white;
+}
+
+.typeFilter {
+  display: flex;
+  padding: 0 $page-padding $spacing-md;
+  gap: $spacing-sm;
+  overflow-x: auto;
+}
+
+.typeBtn {
+  padding: 8rpx 20rpx;
+  border-radius: $radius-round;
+  background: $color-bg-card;
+  box-shadow: $shadow-card;
+  flex-shrink: 0;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.9;
+  }
+}
+
+.typeBtnActive {
+  background: linear-gradient(135deg, $color-secondary 0%, $color-secondary-light 100%);
+  box-shadow: none;
+}
+
+.typeBtnText {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  white-space: nowrap;
+}
+
+.typeBtnTextActive {
+  color: $color-text-white;
+  font-weight: $font-weight-medium;
+}
+
+.equipList {
+  padding: 0 $page-padding;
+}
+
+.equipCard {
+  background: $color-bg-card;
+  border-radius: $radius-md;
+  padding: $spacing-md;
+  box-shadow: $shadow-card;
+  margin-bottom: $spacing-md;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.9;
+    transform: scale(0.98);
+  }
+}
+
+.equipTop {
+  display: flex;
+  margin-bottom: $spacing-md;
+}
+
+.equipImage {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: $radius-sm;
+  flex-shrink: 0;
+  margin-right: $spacing-md;
+}
+
+.equipInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.equipName {
+  font-size: $font-size-md;
+  font-weight: $font-weight-medium;
+  color: $color-text-primary;
+  margin-bottom: 4rpx;
+  @include text-ellipsis;
+}
+
+.equipType {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  margin-bottom: 4rpx;
+}
+
+.equipLocation {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  @include text-ellipsis;
+}
+
+.equipDetail {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: $spacing-sm;
+  border-top: 1rpx solid $color-divider;
+}
+
+.detailItem {
+  display: flex;
+  align-items: center;
+  gap: 4rpx;
+}
+
+.detailLabel {
+  font-size: $font-size-xs;
+  color: $color-text-disabled;
+}
+
+.detailValue {
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+  font-weight: $font-weight-medium;
+}
+
+.checkResultNormal {
+  color: $color-success;
+}
+
+.checkResultAbnormal {
+  color: $color-risk-high;
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 120rpx 0;
+}
+
+.emptyIcon {
+  font-size: 80rpx;
+  margin-bottom: $spacing-md;
+}
+
+.emptyText {
+  font-size: $font-size-md;
+  color: $color-text-tertiary;
+}

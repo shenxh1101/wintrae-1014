@@ -1,0 +1,108 @@
+@use '@/styles/variables.scss' as *;
+
+.card {
+  background: $color-bg-card;
+  border-radius: $radius-md;
+  padding: $spacing-md;
+  box-shadow: $shadow-card;
+  margin-bottom: $spacing-md;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.9;
+    transform: scale(0.98);
+  }
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-md;
+}
+
+.name {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-medium;
+  color: $color-text-primary;
+}
+
+.statusTag {
+  padding: 4rpx 12rpx;
+  border-radius: $radius-xs;
+}
+
+.statusPending {
+  background: rgba(22, 93, 255, 0.1);
+  .statusText {
+    color: $color-pending;
+  }
+}
+
+.statusProgress {
+  background: rgba(255, 125, 0, 0.1);
+  .statusText {
+    color: $color-warning;
+  }
+}
+
+.statusCompleted {
+  background: rgba(0, 180, 42, 0.1);
+  .statusText {
+    color: $color-success;
+  }
+}
+
+.statusText {
+  font-size: $font-size-xs;
+  line-height: $line-height-tight;
+  white-space: nowrap;
+}
+
+.progressRow {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  margin-bottom: $spacing-sm;
+}
+
+.progressBg {
+  flex: 1;
+  height: 12rpx;
+  background: $color-divider;
+  border-radius: 6rpx;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(135deg, $color-secondary 0%, $color-secondary-light 100%);
+  border-radius: 6rpx;
+  transition: width $transition-base;
+}
+
+.progressFillDone {
+  background: linear-gradient(135deg, $color-success 0%, #34d058 100%);
+}
+
+.progressText {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  white-space: nowrap;
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.floor {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+}
+
+.time {
+  font-size: $font-size-xs;
+  color: $color-text-disabled;
+}

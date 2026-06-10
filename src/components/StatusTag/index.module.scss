@@ -1,0 +1,91 @@
+@use '@/styles/variables.scss' as *;
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 4rpx 12rpx;
+  border-radius: $radius-xs;
+  white-space: nowrap;
+}
+
+.tagText {
+  font-size: $font-size-xs;
+  line-height: $line-height-tight;
+}
+
+.statusPending {
+  background: rgba(22, 93, 255, 0.1);
+  .tagText {
+    color: $color-pending;
+  }
+}
+
+.statusProcessing {
+  background: rgba(255, 125, 0, 0.1);
+  .tagText {
+    color: $color-warning;
+  }
+}
+
+.statusRectified {
+  background: rgba(0, 180, 42, 0.1);
+  .tagText {
+    color: $color-success;
+  }
+}
+
+.statusClosed {
+  background: #f2f3f5;
+  .tagText {
+    color: $color-text-tertiary;
+  }
+}
+
+.statusHigh {
+  background: rgba(245, 63, 63, 0.1);
+  .tagText {
+    color: $color-risk-high;
+  }
+}
+
+.statusMedium {
+  background: rgba(255, 125, 0, 0.1);
+  .tagText {
+    color: $color-risk-medium;
+  }
+}
+
+.statusLow {
+  background: rgba(0, 180, 42, 0.1);
+  .tagText {
+    color: $color-risk-low;
+  }
+}
+
+.statusNormal {
+  background: rgba(0, 180, 42, 0.1);
+  .tagText {
+    color: $color-success;
+  }
+}
+
+.statusAbnormal {
+  background: rgba(245, 63, 63, 0.1);
+  .tagText {
+    color: $color-risk-high;
+  }
+}
+
+.statusIn_progress {
+  background: rgba(22, 93, 255, 0.1);
+  .tagText {
+    color: $color-pending;
+  }
+}
+
+.statusCompleted {
+  background: rgba(0, 180, 42, 0.1);
+  .tagText {
+    color: $color-success;
+  }
+}

@@ -1,0 +1,160 @@
+@use '@/styles/variables.scss' as *;
+
+.container {
+  min-height: 100vh;
+  background: $color-bg-page;
+  padding-bottom: 120rpx;
+}
+
+.header {
+  background: linear-gradient(135deg, $color-secondary 0%, $color-secondary-light 100%);
+  padding: $spacing-lg $page-padding;
+  border-radius: 0 0 $radius-xl $radius-xl;
+}
+
+.routeName {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: $color-text-white;
+  margin-bottom: $spacing-sm;
+}
+
+.progressRow {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.progressBg {
+  flex: 1;
+  height: 16rpx;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 8rpx;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: $color-text-white;
+  border-radius: 8rpx;
+  transition: width $transition-base;
+}
+
+.progressText {
+  font-size: $font-size-sm;
+  color: rgba(255, 255, 255, 0.9);
+  white-space: nowrap;
+}
+
+.pointList {
+  padding: $spacing-md $page-padding;
+}
+
+.pointCard {
+  background: $color-bg-card;
+  border-radius: $radius-md;
+  padding: $spacing-lg;
+  box-shadow: $shadow-card;
+  margin-bottom: $spacing-md;
+}
+
+.pointHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-sm;
+}
+
+.pointName {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-medium;
+  color: $color-text-primary;
+}
+
+.checkBtn {
+  padding: 8rpx 24rpx;
+  border-radius: $radius-round;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.9;
+  }
+}
+
+.checkBtnPending {
+  background: linear-gradient(135deg, $color-secondary 0%, $color-secondary-light 100%);
+}
+
+.checkBtnDone {
+  background: rgba(0, 180, 42, 0.1);
+}
+
+.checkBtnText {
+  font-size: $font-size-sm;
+  white-space: nowrap;
+}
+
+.checkBtnTextPending {
+  color: $color-text-white;
+  font-weight: $font-weight-medium;
+}
+
+.checkBtnTextDone {
+  color: $color-success;
+}
+
+.pointInfo {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.pointLocation {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
+.pointTime {
+  font-size: $font-size-xs;
+  color: $color-text-disabled;
+}
+
+.pointRemark {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  margin-top: $spacing-xs;
+}
+
+.bottomBar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: $spacing-md $page-padding;
+  padding-bottom: calc(#{$spacing-md} + env(safe-area-inset-bottom));
+  background: $color-bg-card;
+  box-shadow: 0 -2rpx 12rpx rgba(0, 0, 0, 0.06);
+  z-index: 10;
+}
+
+.finishBtn {
+  width: 100%;
+  height: $button-height-lg;
+  background: linear-gradient(135deg, $color-secondary 0%, $color-secondary-light 100%);
+  border-radius: $radius-button;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.9;
+    transform: scale(0.98);
+  }
+}
+
+.finishText {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-medium;
+  color: $color-text-white;
+}

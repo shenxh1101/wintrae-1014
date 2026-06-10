@@ -1,0 +1,229 @@
+@use '@/styles/variables.scss' as *;
+
+.container {
+  min-height: 100vh;
+  background: $color-bg-page;
+  padding: $spacing-md $page-padding;
+  padding-bottom: 180rpx;
+}
+
+.section {
+  background: $color-bg-card;
+  border-radius: $radius-md;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-md;
+  box-shadow: $shadow-card;
+}
+
+.sectionTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-md;
+}
+
+.photoArea {
+  display: flex;
+  gap: $spacing-md;
+  flex-wrap: wrap;
+}
+
+.photoItem {
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: $radius-sm;
+  overflow: hidden;
+  position: relative;
+}
+
+.photoImg {
+  width: 100%;
+  height: 100%;
+}
+
+.photoAdd {
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: $radius-sm;
+  border: 2rpx dashed $color-border;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: $color-bg-page;
+}
+
+.photoAddIcon {
+  font-size: 48rpx;
+  color: $color-text-disabled;
+  margin-bottom: 4rpx;
+}
+
+.photoAddText {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.typeGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-sm;
+}
+
+.typeItem {
+  padding: 12rpx 24rpx;
+  border-radius: $radius-round;
+  background: $color-bg-page;
+  border: 2rpx solid transparent;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.9;
+  }
+}
+
+.typeItemActive {
+  background: rgba(232, 85, 58, 0.1);
+  border-color: $color-primary;
+}
+
+.typeText {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  white-space: nowrap;
+}
+
+.typeTextActive {
+  color: $color-primary;
+  font-weight: $font-weight-medium;
+}
+
+.inputRow {
+  margin-bottom: $spacing-md;
+}
+
+.inputLabel {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  margin-bottom: $spacing-sm;
+}
+
+.inputField {
+  width: 100%;
+  min-height: 72rpx;
+  padding: 0 $spacing-md;
+  border: 1rpx solid $color-border;
+  border-radius: $radius-sm;
+  font-size: $font-size-md;
+  color: $color-text-primary;
+  background: $color-bg-page;
+  box-sizing: border-box;
+}
+
+.textArea {
+  width: 100%;
+  min-height: 160rpx;
+  padding: $spacing-md;
+  border: 1rpx solid $color-border;
+  border-radius: $radius-sm;
+  font-size: $font-size-md;
+  color: $color-text-primary;
+  background: $color-bg-page;
+  box-sizing: border-box;
+}
+
+.levelRow {
+  display: flex;
+  gap: $spacing-md;
+}
+
+.levelItem {
+  flex: 1;
+  padding: 16rpx 0;
+  border-radius: $radius-sm;
+  text-align: center;
+  border: 2rpx solid transparent;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.9;
+  }
+}
+
+.levelHigh {
+  background: rgba(245, 63, 63, 0.1);
+  border-color: transparent;
+
+  &.levelItemActive {
+    border-color: $color-risk-high;
+  }
+}
+
+.levelMedium {
+  background: rgba(255, 125, 0, 0.1);
+  border-color: transparent;
+
+  &.levelItemActive {
+    border-color: $color-risk-medium;
+  }
+}
+
+.levelLow {
+  background: rgba(0, 180, 42, 0.1);
+  border-color: transparent;
+
+  &.levelItemActive {
+    border-color: $color-risk-low;
+  }
+}
+
+.levelText {
+  font-size: $font-size-sm;
+  white-space: nowrap;
+}
+
+.levelTextHigh {
+  color: $color-risk-high;
+}
+
+.levelTextMedium {
+  color: $color-risk-medium;
+}
+
+.levelTextLow {
+  color: $color-risk-low;
+}
+
+.bottomBar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: $spacing-md $page-padding;
+  padding-bottom: calc(#{$spacing-md} + env(safe-area-inset-bottom));
+  background: $color-bg-card;
+  box-shadow: 0 -2rpx 12rpx rgba(0, 0, 0, 0.06);
+  z-index: 10;
+}
+
+.submitBtn {
+  width: 100%;
+  height: $button-height-lg;
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  border-radius: $radius-button;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.9;
+    transform: scale(0.98);
+  }
+}
+
+.submitText {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-medium;
+  color: $color-text-white;
+}
