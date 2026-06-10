@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { View, Text } from '@tarojs/components';
-import { inspectionRoutes } from '@/data/inspection';
+import { useDidShow } from '@tarojs/taro';
+import { useAppStore } from '@/store';
 import InspectionCard from '@/components/InspectionCard';
 import classnames from 'classnames';
 import styles from './index.module.scss';
@@ -9,20 +10,25 @@ const floorOptions = ['全部', '1F', '2F', '3F', '4F', '5F'];
 
 const InspectPage: React.FC = () => {
   const [activeFloor, setActiveFloor] = useState('全部');
+  const inspections = useAppStore(s => s.inspections);
+
+  useDidShow(() => {
+    useAppStore.getState();
+  });
 
   const filteredRoutes = useMemo(() => {
-    if (activeFloor === '全部') return inspectionRoutes;
-    return inspectionRoutes.filter(r => r.floor === activeFloor);
-  }, [activeFloor]);
+    if (activeFloor === '全部') return inspections;
+    return inspections.filter(r => r.floor === activeFloor);
+  }, [activeFloor, inspections]);
 
-  const completedCount = inspectionRoutes.filter(r => r.status === 'completed').length;
-  const inProgressCount = inspectionRoutes.filter(r => r.status === 'in_progress').length;
+  const completedCount = inspections.filter(r => r.status === 'completed').length;
+  const inProgressCount = inspections.filter(r => r.status === 'in_progress').length;
 
   return (
     <View className={styles.container}>
       <View className={styles.summary}>
         <View className={styles.summaryItem}>
-          <Text className={styles.summaryValue}>{inspectionRoutes.length}</Text>
+          <Text className={styles.summaryValue}>{inspections.length}</Text>
           <Text className={styles.summaryLabel}>今日路线</Text>
         </View>
         <View className={styles.summaryItem}>

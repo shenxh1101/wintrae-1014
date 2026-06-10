@@ -50,40 +50,20 @@
   color: $color-text-white;
 }
 
+.typeFilterWrap {
+  width: 100%;
+}
+
 .typeFilter {
   display: flex;
   padding: 0 $page-padding $spacing-md;
   gap: $spacing-sm;
-  overflow-x: auto;
 }
 
-.typeBtn {
-  padding: 8rpx 20rpx;
-  border-radius: $radius-round;
-  background: $color-bg-card;
-  box-shadow: $shadow-card;
+.typeFilter::after {
+  content: '';
+  width: $page-padding;
   flex-shrink: 0;
-  transition: all $transition-base;
-
-  &:active {
-    opacity: 0.9;
-  }
-}
-
-.typeBtnActive {
-  background: linear-gradient(135deg, $color-secondary 0%, $color-secondary-light 100%);
-  box-shadow: none;
-}
-
-.typeBtnText {
-  font-size: $font-size-sm;
-  color: $color-text-secondary;
-  white-space: nowrap;
-}
-
-.typeBtnTextActive {
-  color: $color-text-white;
-  font-weight: $font-weight-medium;
 }
 
 .equipList {
@@ -97,11 +77,39 @@
   box-shadow: $shadow-card;
   margin-bottom: $spacing-md;
   transition: all $transition-base;
+  border: 3rpx solid transparent;
+  position: relative;
 
   &:active {
     opacity: 0.9;
     transform: scale(0.98);
   }
+}
+
+.equipCardHighlight {
+  border: 3rpx solid $color-secondary;
+  box-shadow: 0 4rpx 20rpx rgba(43, 95, 217, 0.25);
+  animation: highlight-pulse 2s ease-in-out infinite;
+}
+
+@keyframes highlight-pulse {
+  0%, 100% { box-shadow: 0 4rpx 20rpx rgba(43, 95, 217, 0.25); }
+  50% { box-shadow: 0 6rpx 28rpx rgba(43, 95, 217, 0.45); }
+}
+
+.scanBadge {
+  position: absolute;
+  top: 12rpx;
+  right: 12rpx;
+  padding: 4rpx 12rpx;
+  background: linear-gradient(135deg, $color-secondary 0%, $color-secondary-light 100%);
+  border-radius: $radius-xs;
+}
+
+.scanBadgeText {
+  font-size: $font-size-xs;
+  color: $color-text-white;
+  white-space: nowrap;
 }
 
 .equipTop {
@@ -142,12 +150,20 @@
   @include text-ellipsis;
 }
 
+.equipCode {
+  font-size: $font-size-xs;
+  color: $color-text-disabled;
+  margin-top: 4rpx;
+}
+
 .equipDetail {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding-top: $spacing-sm;
   border-top: 1rpx solid $color-divider;
+  flex-wrap: wrap;
+  gap: $spacing-sm;
 }
 
 .detailItem {
@@ -167,12 +183,38 @@
   font-weight: $font-weight-medium;
 }
 
+.expireBadge {
+  font-size: $font-size-xs;
+  color: $color-risk-high;
+  font-weight: $font-weight-semibold;
+}
+
 .checkResultNormal {
   color: $color-success;
 }
 
 .checkResultAbnormal {
   color: $color-risk-high;
+}
+
+.scanError {
+  margin: 0 $page-padding $spacing-md;
+  padding: $spacing-md;
+  background: rgba(245, 63, 63, 0.1);
+  border-radius: $radius-sm;
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.scanErrorIcon {
+  font-size: $font-size-lg;
+}
+
+.scanErrorText {
+  font-size: $font-size-sm;
+  color: $color-risk-high;
+  flex: 1;
 }
 
 .empty {

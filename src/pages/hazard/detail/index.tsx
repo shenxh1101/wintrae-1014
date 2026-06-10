@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, Image } from '@tarojs/components';
-import Taro, { useRouter } from '@tarojs/taro';
-import { hazardList, hazardTypeMap, hazardLevelMap, hazardStatusMap } from '@/data/hazard';
+import Taro, { useRouter, useDidShow } from '@tarojs/taro';
+import { hazardTypeMap, hazardLevelMap, hazardStatusMap } from '@/data/hazard';
+import { useAppStore } from '@/store';
 import StatusTag from '@/components/StatusTag';
 import classnames from 'classnames';
 import styles from './index.module.scss';
@@ -9,7 +10,22 @@ import styles from './index.module.scss';
 const HazardDetailPage: React.FC = () => {
   const router = useRouter();
   const id = router.params.id || 'HZ001';
-  const hazard = hazardList.find(h => h.id === id) || hazardList[0];
+  const getHazardById = useAppStore(s => s.getHazardById);
+  const [hazard, setHazard] = useState(() => getHazardById(id));
+
+  useDidShow(() => {
+    setHazard(getHazardById(id));
+  });
+
+  if (!hazard) {
+    return (
+      <View className={styles.container}>
+        <View style={{ padding: 120, textAlign: 'center' }}>
+          <Text>未找到该隐患记录</Text>
+        </View>
+      </View>
+    );
+  }
 
   const timeline = [
     { label: '隐患上报', time: hazard.reportTime, desc: `${hazard.reporter} 上报了隐患`, active: true },
@@ -51,6 +67,12 @@ const HazardDetailPage: React.FC = () => {
               <View className={styles.infoItem}>
                 <Text className={styles.infoLabel}>期限：</Text>
                 <Text className={styles.infoValue}>{hazard.deadline}</Text>
+              </View>
+            )}
+            {hazard.reporter && (
+              <View className={styles.infoItem}>
+                <Text className={styles.infoLabel}>上报人：</Text>
+                <Text className={styles.infoValue}>{hazard.reporter}</Text>
               </View>
             )}
           </View>
@@ -101,7 +123,7 @@ const HazardDetailPage: React.FC = () => {
         )}
       </View>
 
-      {hazard.status === 'pending' && (
+      {(hazard.status === 'pending' || hazard.status === 'processing') && (
         <View className={styles.bottomBar}>
           <View
             className={classnames(styles.actionBtn, styles.actionBtnSecondary)}
@@ -113,7 +135,9 @@ const HazardDetailPage: React.FC = () => {
             className={classnames(styles.actionBtn, styles.actionBtnPrimary)}
             onClick={() => Taro.navigateTo({ url: `/pages/rectify/index?id=${hazard.id}` })}
           >
-            <Text className={styles.actionBtnText}>填写整改</Text>
+            <Text className={styles.actionBtnText}>
+              {hazard.status === 'pending' ? '填写整改' : '复查验收'}
+            </Text>
           </View>
         </View>
       )}

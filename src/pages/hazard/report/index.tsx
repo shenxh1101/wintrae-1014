@@ -3,17 +3,22 @@ import { View, Text, Input, Textarea, Image } from '@tarojs/components';
 import Taro from '@tarojs/taro';
 import { HazardType, HazardLevel } from '@/types';
 import { hazardTypeMap } from '@/data/hazard';
+import { useAppStore } from '@/store';
 import classnames from 'classnames';
 import styles from './index.module.scss';
 
 const hazardTypes: HazardType[] = ['channel_block', 'illegal_power', 'extinguisher_missing', 'fire_door', 'other'];
 
+const floorOptions = ['1F', '2F', '3F', '4F', '5F', 'B1'];
+
 const HazardReportPage: React.FC = () => {
   const [selectedType, setSelectedType] = useState<HazardType>('channel_block');
   const [selectedLevel, setSelectedLevel] = useState<HazardLevel>('medium');
+  const [selectedFloor, setSelectedFloor] = useState('1F');
   const [location, setLocation] = useState('');
   const [description, setDescription] = useState('');
   const [photos, setPhotos] = useState<string[]>([]);
+  const addHazard = useAppStore(s => s.addHazard);
 
   const handleAddPhoto = () => {
     Taro.chooseImage({
@@ -38,10 +43,20 @@ const HazardReportPage: React.FC = () => {
       Taro.showToast({ title: '请填写隐患描述', icon: 'none' });
       return;
     }
+
+    addHazard({
+      type: selectedType,
+      level: selectedLevel,
+      location: `${selectedFloor} ${location}`,
+      floor: selectedFloor,
+      description,
+      imageUrl: photos[0] || `https://picsum.photos/id/${Math.floor(Math.random() * 100)}/300/300`,
+    });
+
     Taro.showToast({ title: '上报成功', icon: 'success' });
     setTimeout(() => {
       Taro.navigateBack();
-    }, 1500);
+    }, 1200);
   };
 
   return (
@@ -81,6 +96,23 @@ const HazardReportPage: React.FC = () => {
       </View>
 
       <View className={styles.section}>
+        <Text className={styles.sectionTitle}>所在楼层</Text>
+        <View className={styles.typeGrid}>
+          {floorOptions.map(f => (
+            <View
+              key={f}
+              className={classnames(styles.typeItem, selectedFloor === f && styles.typeItemActive)}
+              onClick={() => setSelectedFloor(f)}
+            >
+              <Text className={classnames(styles.typeText, selectedFloor === f && styles.typeTextActive)}>
+                {f}
+              </Text>
+            </View>
+          ))}
+        </View>
+      </View>
+
+      <View className={styles.section}>
         <Text className={styles.sectionTitle}>风险等级</Text>
         <View className={styles.levelRow}>
           <View
@@ -109,7 +141,7 @@ const HazardReportPage: React.FC = () => {
           <Text className={styles.inputLabel}>隐患位置</Text>
           <Input
             className={styles.inputField}
-            placeholder="请输入隐患所在位置"
+            placeholder="请输入隐患所在位置，如A区301铺位旁"
             value={location}
             onInput={e => setLocation(e.detail.value)}
           />

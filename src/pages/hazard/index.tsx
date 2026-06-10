@@ -1,8 +1,8 @@
 import React, { useState, useMemo } from 'react';
 import { View, Text } from '@tarojs/components';
-import Taro from '@tarojs/taro';
+import Taro, { useDidShow } from '@tarojs/taro';
 import { HazardStatus } from '@/types';
-import { hazardList } from '@/data/hazard';
+import { useAppStore } from '@/store';
 import HazardCard from '@/components/HazardCard';
 import classnames from 'classnames';
 import styles from './index.module.scss';
@@ -17,11 +17,16 @@ const statusFilters: { key: HazardStatus | 'all'; label: string }[] = [
 
 const HazardPage: React.FC = () => {
   const [activeFilter, setActiveFilter] = useState<HazardStatus | 'all'>('all');
+  const hazards = useAppStore(s => s.hazards);
+
+  useDidShow(() => {
+    useAppStore.getState();
+  });
 
   const filteredList = useMemo(() => {
-    if (activeFilter === 'all') return hazardList;
-    return hazardList.filter(h => h.status === activeFilter);
-  }, [activeFilter]);
+    if (activeFilter === 'all') return hazards;
+    return hazards.filter(h => h.status === activeFilter);
+  }, [activeFilter, hazards]);
 
   return (
     <View className={styles.container}>

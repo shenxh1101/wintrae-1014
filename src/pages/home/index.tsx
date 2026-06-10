@@ -1,17 +1,25 @@
 import React, { useState } from 'react';
 import { View, Text } from '@tarojs/components';
-import Taro from '@tarojs/taro';
+import Taro, { useDidShow } from '@tarojs/taro';
 import { UserRole } from '@/types';
-import { hazardList } from '@/data/hazard';
-import { statistics } from '@/data/statistics';
+import { useAppStore } from '@/store';
 import HazardCard from '@/components/HazardCard';
 import classnames from 'classnames';
 import styles from './index.module.scss';
 
 const HomePage: React.FC = () => {
   const [role, setRole] = useState<UserRole>('tenant');
+  const hazards = useAppStore(s => s.hazards);
 
-  const recentHazards = hazardList.filter(h => h.status !== 'closed').slice(0, 3);
+  useDidShow(() => {
+    useAppStore.getState();
+  });
+
+  const pendingHazards = hazards.filter(h => h.status === 'pending').length;
+  const processingHazards = hazards.filter(h => h.status === 'processing').length;
+  const rectifiedHazards = hazards.filter(h => h.status === 'rectified').length;
+
+  const recentHazards = hazards.filter(h => h.status !== 'closed').slice(0, 3);
 
   return (
     <View className={styles.container}>
@@ -37,22 +45,22 @@ const HomePage: React.FC = () => {
         </View>
         <View className={styles.statsGrid}>
           <View className={styles.statItem}>
-            <Text className={styles.statValue}>{statistics.pendingHazards}</Text>
+            <Text className={styles.statValue}>{pendingHazards}</Text>
             <Text className={styles.statLabel}>待处理</Text>
           </View>
           <View className={styles.statItem}>
-            <Text className={styles.statValue}>{statistics.processingHazards}</Text>
+            <Text className={styles.statValue}>{processingHazards}</Text>
             <Text className={styles.statLabel}>整改中</Text>
           </View>
           <View className={styles.statItem}>
-            <Text className={classnames(styles.statValue, statistics.overdueCount > 0 && styles.statValueUrgent)}>
-              {statistics.overdueCount}
-            </Text>
+            <Text className={classnames(styles.statValue, styles.statValueUrgent)}>
+            2
+          </Text>
             <Text className={styles.statLabel}>已逾期</Text>
           </View>
           <View className={styles.statItem}>
-            <Text className={classnames(styles.statValue, statistics.highRiskCount > 0 && styles.statValueUrgent)}>
-              {statistics.highRiskCount}
+            <Text className={classnames(styles.statValue, styles.statValueUrgent)}>
+              {hazards.filter(h => h.level === 'high' && h.status !== 'closed').length}
             </Text>
             <Text className={styles.statLabel}>高风险</Text>
           </View>
@@ -100,12 +108,12 @@ const HomePage: React.FC = () => {
         </View>
       </View>
 
-      {statistics.overdueCount > 0 && (
+      {pendingHazards > 0 && (
         <View className={styles.section}>
           <View className={styles.alertCard}>
             <Text className={styles.alertIcon}>⚠️</Text>
             <View className={styles.alertContent}>
-              <Text className={styles.alertTitle}>{statistics.overdueCount}项隐患已逾期</Text>
+              <Text className={styles.alertTitle}>{pendingHazards}项隐患待处理</Text>
               <Text className={styles.alertDesc}>请尽快处理，避免安全风险</Text>
             </View>
           </View>
