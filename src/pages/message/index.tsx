@@ -1,7 +1,8 @@
 import React, { useState, useMemo } from 'react';
 import { View, Text } from '@tarojs/components';
+import { useDidShow } from '@tarojs/taro';
 import { MessageType } from '@/types';
-import { messageList } from '@/data/message';
+import { useAppStore } from '@/store';
 import MessageItem from '@/components/MessageItem';
 import classnames from 'classnames';
 import styles from './index.module.scss';
@@ -18,13 +19,21 @@ const typeFilters: { key: MessageType | 'all'; label: string }[] = [
 
 const MessagePage: React.FC = () => {
   const [activeFilter, setActiveFilter] = useState<MessageType | 'all'>('all');
+  const messages = useAppStore(s => s.messages);
+  const markAllMessagesRead = useAppStore(s => s.markAllMessagesRead);
+  const checkOverdue = useAppStore(s => s.checkOverdue);
+
+  useDidShow(() => {
+    useAppStore.getState();
+    checkOverdue();
+  });
 
   const filteredList = useMemo(() => {
-    if (activeFilter === 'all') return messageList;
-    return messageList.filter(m => m.type === activeFilter);
-  }, [activeFilter]);
+    if (activeFilter === 'all') return messages;
+    return messages.filter(m => m.type === activeFilter);
+  }, [activeFilter, messages]);
 
-  const unreadCount = messageList.filter(m => !m.read).length;
+  const unreadCount = messages.filter(m => !m.read).length;
 
   return (
     <View className={styles.container}>
@@ -43,8 +52,8 @@ const MessagePage: React.FC = () => {
       </View>
 
       {unreadCount > 0 && (
-        <View className={styles.markAll}>
-          <Text className={styles.markAllText}>全部标为已读</Text>
+        <View className={styles.markAll} onClick={markAllMessagesRead}>
+          <Text className={styles.markAllText}>全部标为已读（{unreadCount}条未读）</Text>
         </View>
       )}
 

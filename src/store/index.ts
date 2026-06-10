@@ -21,6 +21,9 @@ interface AppState {
     description: string;
     imageUrl: string;
     floor: string;
+    sourcePointId?: string;
+    sourceRouteId?: string;
+    sourcePointName?: string;
   }) => void;
 
   updateHazardRectify: (id: string, patch: {
@@ -42,9 +45,19 @@ interface AppState {
   getEquipmentByCode: (code: string) => EquipmentItem | undefined;
 
   signInTraining: (id: string) => void;
+
+  markMessageRead: (id: string) => void;
+  markAllMessagesRead: () => void;
+
+  checkOverdue: () => void;
 }
 
-const STORAGE_KEY = 'fire_mgmt_store_v1';
+const STORAGE_KEY = 'fire_mgmt_store_v2';
+
+const nowStr = () => {
+  const n = new Date();
+  return `${n.getFullYear()}-${String(n.getMonth() + 1).padStart(2, '0')}-${String(n.getDate()).padStart(2, '0')} ${String(n.getHours()).padStart(2, '0')}:${String(n.getMinutes()).padStart(2, '0')}`;
+};
 
 const loadPersisted = () => {
   try {
@@ -74,6 +87,29 @@ const persist = (state: Partial<AppState>) => {
 
 const persisted = loadPersisted();
 
+const addMessageInternal = (
+  msgs: MessageItem[],
+  type: MessageItem['type'],
+  priority: MessageItem['priority'],
+  title: string,
+  content: string,
+  relatedId?: string,
+  relatedType?: 'hazard' | 'equipment'
+): MessageItem[] => {
+  const newMsg: MessageItem = {
+    id: `MSG${Date.now().toString().slice(-6)}${Math.random().toString(36).slice(2, 5)}`,
+    type,
+    priority,
+    title,
+    content,
+    time: nowStr(),
+    read: false,
+    relatedId,
+    relatedType,
+  };
+  return [newMsg, ...msgs];
+};
+
 export const useAppStore = create<AppState>((set, get) => ({
   hazards: persisted?.hazards ?? hazardList,
   inspections: persisted?.inspections ?? inspectionRoutes,
@@ -83,21 +119,38 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   addHazard: (payload) => {
     const newId = `HZ${Date.now().toString().slice(-6)}`;
-    const now = new Date();
-    const timeStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-
     const newHazard: HazardItem = {
       id: newId,
       title: payload.description.slice(0, 20) || '隐患上报',
       status: 'pending',
       reporter: '当前用户',
       reporterRole: 'tenant' as UserRole,
-      reportTime: timeStr,
+      reportTime: nowStr(),
       ...payload,
     };
 
     set(s => {
-      const nextState = { hazards: [newHazard, ...s.hazards] };
+      let newMessages = s.messages;
+      if (payload.level === 'high') {
+        const src = payload.sourcePointName
+          ? `（来源：巡检-${payload.sourcePointName}）`
+          : '';
+        newMessages = addMessageInternal(
+          newMessages, 'high_risk', 'urgent',
+          '高风险隐患通知',
+          `新上报高风险隐患${src}「${newHazard.title}」，请立即安排整改`,
+          newId, 'hazard'
+        );
+      }
+      if (payload.sourcePointName) {
+        newMessages = addMessageInternal(
+          newMessages, 'rectify', 'important',
+          '巡检异常上报',
+          `巡检点位「${payload.sourcePointName}」发现异常，已自动生成隐患记录`,
+          newId, 'hazard'
+        );
+      }
+      const nextState = { hazards: [newHazard, ...s.hazards], messages: newMessages };
       persist(nextState);
       return nextState;
     });
@@ -105,6 +158,7 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   updateHazardRectify: (id, patch) => {
     set(s => {
+      let newMessages = s.messages;
       const hazards = s.hazards.map(h => {
         if (h.id !== id) return h;
         let status: HazardStatus = h.status;
@@ -114,13 +168,30 @@ export const useAppStore = create<AppState>((set, get) => ({
         if (patch.reviewResult === 'pass') {
           status = 'rectified';
           rectifyResult = patch.reviewNote || '复查合格';
-          const n = new Date();
-          reviewTime = `${n.getFullYear()}-${String(n.getMonth() + 1).padStart(2, '0')}-${String(n.getDate()).padStart(2, '0')} ${String(n.getHours()).padStart(2, '0')}:${String(n.getMinutes()).padStart(2, '0')}`;
+          reviewTime = nowStr();
+          newMessages = addMessageInternal(
+            newMessages, 'rectify', 'important',
+            '整改完成通知',
+            `隐患「${h.title}」已完成整改，复查合格`,
+            id, 'hazard'
+          );
         } else if (patch.reviewResult === 'fail') {
           status = 'processing';
           rectifyResult = patch.reviewNote || '复查不合格，需重新整改';
+          newMessages = addMessageInternal(
+            newMessages, 'rectify', 'urgent',
+            '复查不合格提醒',
+            `隐患「${h.title}」复查不合格，需重新整改`,
+            id, 'hazard'
+          );
         } else if (patch.rectifyRequirement) {
           status = 'processing';
+          newMessages = addMessageInternal(
+            newMessages, 'rectify', 'important',
+            '新整改任务',
+            `您被指派处理隐患「${h.title}」，请在期限内完成整改`,
+            id, 'hazard'
+          );
         }
 
         return {
@@ -133,7 +204,7 @@ export const useAppStore = create<AppState>((set, get) => ({
           status,
         };
       });
-      const nextState = { hazards };
+      const nextState = { hazards, messages: newMessages };
       persist(nextState);
       return nextState;
     });
@@ -147,11 +218,9 @@ export const useAppStore = create<AppState>((set, get) => ({
     set(s => {
       const inspections = s.inspections.map(r => {
         if (r.id !== routeId) return r;
-        const now = new Date();
-        const timeStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
         const points = r.points.map(p =>
           p.id === pointId && !p.checked
-            ? { ...p, checked: true, checkTime: timeStr, remark: '正常' }
+            ? { ...p, checked: true, checkTime: nowStr(), remark: '正常' }
             : p
         );
         const checkedCount = points.filter(p => p.checked).length;
@@ -160,8 +229,8 @@ export const useAppStore = create<AppState>((set, get) => ({
           points,
           checkedPoints: checkedCount,
           status: checkedCount === 0 ? 'pending' : checkedCount === points.length ? 'completed' : 'in_progress',
-          startTime: r.startTime || timeStr,
-          endTime: checkedCount === points.length ? timeStr : r.endTime,
+          startTime: r.startTime || nowStr(),
+          endTime: checkedCount === points.length ? nowStr() : r.endTime,
         };
       });
       const nextState = { inspections };
@@ -174,9 +243,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     set(s => {
       const inspections = s.inspections.map(r => {
         if (r.id !== routeId) return r;
-        const now = new Date();
-        const timeStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-        return { ...r, status: 'completed', endTime: timeStr };
+        return { ...r, status: 'completed', endTime: nowStr() };
       });
       const nextState = { inspections };
       persist(nextState);
@@ -196,13 +263,63 @@ export const useAppStore = create<AppState>((set, get) => ({
     set(s => {
       const trainings = s.trainings.map(t => {
         if (t.id !== id || t.signedIn) return t;
-        const now = new Date();
-        const timeStr = now.toLocaleString('zh-CN', { hour12: false }).replace(/\//g, '-');
-        return { ...t, signedIn: true, signTime: timeStr };
+        return { ...t, signedIn: true, signTime: new Date().toLocaleString('zh-CN', { hour12: false }).replace(/\//g, '-') };
       });
       const nextState = { trainings };
       persist(nextState);
       return nextState;
+    });
+  },
+
+  markMessageRead: (id) => {
+    set(s => {
+      const messages = s.messages.map(m =>
+        m.id === id ? { ...m, read: true } : m
+      );
+      const nextState = { messages };
+      persist(nextState);
+      return nextState;
+    });
+  },
+
+  markAllMessagesRead: () => {
+    set(s => {
+      const messages = s.messages.map(m => ({ ...m, read: true }));
+      const nextState = { messages };
+      persist(nextState);
+      return nextState;
+    });
+  },
+
+  checkOverdue: () => {
+    set(s => {
+      const now = new Date();
+      let newMessages = s.messages;
+      const hazards = s.hazards.map(h => {
+        if (h.status === 'processing' && h.deadline) {
+          const deadlineDate = new Date(h.deadline);
+          if (deadlineDate < now) {
+            const existingOverdue = s.messages.find(m =>
+              m.relatedId === h.id && m.type === 'overdue' && !m.read
+            );
+            if (!existingOverdue) {
+              newMessages = addMessageInternal(
+                newMessages, 'overdue', 'urgent',
+                '整改逾期提醒',
+                `隐患「${h.title}」已超过整改期限，请尽快处理`,
+                h.id, 'hazard'
+              );
+            }
+          }
+        }
+        return h;
+      });
+      if (newMessages !== s.messages) {
+        const nextState = { hazards, messages: newMessages };
+        persist(nextState);
+        return nextState;
+      }
+      return s;
     });
   },
 }));

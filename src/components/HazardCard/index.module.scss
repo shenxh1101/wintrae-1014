@@ -78,7 +78,21 @@
   margin-top: $spacing-sm;
 }
 
+.footerLeft {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
 .time {
   font-size: $font-size-xs;
   color: $color-text-disabled;
+}
+
+.source {
+  font-size: $font-size-xs;
+  color: $color-secondary;
+  margin-top: 2rpx;
+  @include text-ellipsis;
 }

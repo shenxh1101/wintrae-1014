@@ -69,6 +69,29 @@
   font-size: $font-size-lg;
   font-weight: $font-weight-medium;
   color: $color-text-primary;
+  flex: 1;
+}
+
+.pointActions {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.reportBtn {
+  padding: 6rpx 16rpx;
+  border-radius: $radius-round;
+  background: rgba(232, 85, 58, 0.1);
+
+  &:active {
+    opacity: 0.9;
+  }
+}
+
+.reportBtnText {
+  font-size: $font-size-xs;
+  color: $color-primary;
+  white-space: nowrap;
 }
 
 .checkBtn {
@@ -157,4 +180,123 @@
   font-size: $font-size-lg;
   font-weight: $font-weight-medium;
   color: $color-text-white;
+}
+
+.reportModal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: $spacing-xl $page-padding;
+}
+
+.reportContent {
+  width: 100%;
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-xl;
+}
+
+.reportTitle {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: $color-text-primary;
+  display: block;
+  margin-bottom: $spacing-md;
+}
+
+.reportPoint {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  display: block;
+  margin-bottom: $spacing-lg;
+}
+
+.imageRow {
+  margin-bottom: $spacing-md;
+}
+
+.addImageBtn {
+  width: 160rpx;
+  height: 160rpx;
+  border: 2rpx dashed $color-divider;
+  border-radius: $radius-sm;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: $color-bg-page;
+}
+
+.addImageText {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
+.previewImage {
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: $radius-sm;
+}
+
+.reportInput {
+  width: 100%;
+  min-height: 160rpx;
+  background: $color-bg-page;
+  border-radius: $radius-sm;
+  padding: $spacing-md;
+  font-size: $font-size-md;
+  color: $color-text-primary;
+  margin-bottom: $spacing-lg;
+  box-sizing: border-box;
+}
+
+.reportBtns {
+  display: flex;
+  gap: $spacing-md;
+}
+
+.cancelBtn {
+  flex: 1;
+  height: $button-height-lg;
+  border-radius: $radius-button;
+  background: $color-bg-page;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:active {
+    opacity: 0.9;
+  }
+}
+
+.cancelBtnText {
+  font-size: $font-size-md;
+  color: $color-text-secondary;
+}
+
+.submitBtn {
+  flex: 1;
+  height: $button-height-lg;
+  border-radius: $radius-button;
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:active {
+    opacity: 0.9;
+    transform: scale(0.98);
+  }
+}
+
+.submitBtnText {
+  font-size: $font-size-md;
+  color: $color-text-white;
+  font-weight: $font-weight-medium;
 }

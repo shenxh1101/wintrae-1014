@@ -10,14 +10,19 @@ import styles from './index.module.scss';
 const HomePage: React.FC = () => {
   const [role, setRole] = useState<UserRole>('tenant');
   const hazards = useAppStore(s => s.hazards);
+  const checkOverdue = useAppStore(s => s.checkOverdue);
+  const messages = useAppStore(s => s.messages);
 
   useDidShow(() => {
     useAppStore.getState();
+    checkOverdue();
   });
 
   const pendingHazards = hazards.filter(h => h.status === 'pending').length;
   const processingHazards = hazards.filter(h => h.status === 'processing').length;
   const rectifiedHazards = hazards.filter(h => h.status === 'rectified').length;
+  const overdueCount = hazards.filter(h => h.status === 'processing' && h.deadline && new Date(h.deadline) < new Date()).length;
+  const unreadMsgCount = messages.filter(m => !m.read).length;
 
   const recentHazards = hazards.filter(h => h.status !== 'closed').slice(0, 3);
 
@@ -54,7 +59,7 @@ const HomePage: React.FC = () => {
           </View>
           <View className={styles.statItem}>
             <Text className={classnames(styles.statValue, styles.statValueUrgent)}>
-            2
+            {overdueCount}
           </Text>
             <Text className={styles.statLabel}>已逾期</Text>
           </View>
@@ -115,6 +120,18 @@ const HomePage: React.FC = () => {
             <View className={styles.alertContent}>
               <Text className={styles.alertTitle}>{pendingHazards}项隐患待处理</Text>
               <Text className={styles.alertDesc}>请尽快处理，避免安全风险</Text>
+            </View>
+          </View>
+        </View>
+      )}
+
+      {unreadMsgCount > 0 && (
+        <View className={styles.section}>
+          <View className={styles.alertCard} onClick={() => Taro.switchTab({ url: '/pages/message/index' })}>
+            <Text className={styles.alertIcon}>🔔</Text>
+            <View className={styles.alertContent}>
+              <Text className={styles.alertTitle}>{unreadMsgCount}条未读消息</Text>
+              <Text className={styles.alertDesc}>点击查看消息中心</Text>
             </View>
           </View>
         </View>

@@ -22,6 +22,9 @@ export interface HazardItem {
   rectifyRequirement?: string;
   rectifyResult?: string;
   reviewTime?: string;
+  sourcePointId?: string;
+  sourceRouteId?: string;
+  sourcePointName?: string;
 }
 
 export interface InspectionPoint {
@@ -73,6 +76,7 @@ export interface MessageItem {
   time: string;
   read: boolean;
   relatedId?: string;
+  relatedType?: 'hazard' | 'equipment';
 }
 
 export interface TrainingItem {

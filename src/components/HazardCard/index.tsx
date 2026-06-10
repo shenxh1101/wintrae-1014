@@ -29,7 +29,12 @@ const HazardCard: React.FC<HazardCardProps> = ({ data }) => {
           <Text className={styles.location}>{data.location}</Text>
         </View>
         <View className={styles.footer}>
-          <Text className={styles.time}>{data.reportTime}</Text>
+          <View className={styles.footerLeft}>
+            <Text className={styles.time}>{data.reportTime}</Text>
+            {data.sourcePointName && (
+              <Text className={styles.source}>巡检: {data.sourcePointName}</Text>
+            )}
+          </View>
           <StatusTag status={data.status} statusMap={hazardStatusMap} />
         </View>
       </View>

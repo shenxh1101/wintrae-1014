@@ -114,3 +114,15 @@
   font-size: $font-size-xs;
   color: $color-text-disabled;
 }
+
+.bottomRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.actionHint {
+  font-size: $font-size-xs;
+  color: $color-primary;
+  white-space: nowrap;
+}

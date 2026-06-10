@@ -8,16 +8,27 @@
 
 .filterBar {
   display: flex;
-  padding: $spacing-md $page-padding;
-  gap: $spacing-sm;
+  align-items: center;
   background: $color-bg-card;
   border-bottom: 1rpx solid $color-divider;
+  padding-right: $page-padding;
+}
+
+.statusScroll {
+  flex: 1;
+}
+
+.statusRow {
+  display: flex;
+  padding: $spacing-md $spacing-sm $spacing-md $page-padding;
+  gap: $spacing-sm;
 }
 
 .filterBtn {
   padding: 8rpx 24rpx;
   border-radius: $radius-round;
   background: $color-bg-page;
+  flex-shrink: 0;
   transition: all $transition-base;
 
   &:active {
@@ -38,6 +49,100 @@
 .filterTextActive {
   color: $color-text-white;
   font-weight: $font-weight-medium;
+}
+
+.filterToggle {
+  padding: 8rpx 20rpx;
+  border-radius: $radius-round;
+  background: $color-bg-page;
+  flex-shrink: 0;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.9;
+  }
+}
+
+.filterToggleActive {
+  background: rgba(232, 85, 58, 0.1);
+}
+
+.filterToggleText {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  white-space: nowrap;
+}
+
+.filterToggleActive .filterToggleText {
+  color: $color-primary;
+  font-weight: $font-weight-medium;
+}
+
+.advancedFilter {
+  background: $color-bg-card;
+  padding: $spacing-lg $page-padding;
+  border-bottom: 1rpx solid $color-divider;
+}
+
+.filterSection {
+  margin-bottom: $spacing-md;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.filterLabel {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  margin-bottom: $spacing-sm;
+}
+
+.filterOptions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-sm;
+}
+
+.filterOptionBtn {
+  padding: 8rpx 20rpx;
+  border-radius: $radius-round;
+  background: $color-bg-page;
+  border: 1rpx solid transparent;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.9;
+  }
+}
+
+.filterOptionBtnActive {
+  background: rgba(232, 85, 58, 0.1);
+  border-color: $color-primary;
+}
+
+.filterOptionText {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  white-space: nowrap;
+}
+
+.filterOptionTextActive {
+  color: $color-primary;
+  font-weight: $font-weight-medium;
+}
+
+.resetRow {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: $spacing-md;
+  padding-top: $spacing-md;
+  border-top: 1rpx solid $color-divider;
+}
+
+.resetText {
+  font-size: $font-size-sm;
+  color: $color-primary;
 }
 
 .list {
